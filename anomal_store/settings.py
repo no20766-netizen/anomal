@@ -4,7 +4,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-1234567890'
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = [
     'anomal.kr',
     'www.anomal.kr',
