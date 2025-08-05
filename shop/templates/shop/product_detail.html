@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{ product.name }}</title>
+</head>
+<body>
+  <h1>{{ product.name }}</h1>
+  <p>{{ product.description }}</p>
+  <p><strong>가격:</strong> {{ product.price }}원</p>
+  <img src="{{ product.image.url }}" width="400" alt="{{ product.name }}">
+  <br><br>
+  <a href="/">← 목록으로 돌아가기</a>
+</body>
+</html>

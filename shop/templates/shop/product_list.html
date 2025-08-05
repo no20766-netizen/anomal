@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>anomal - 제품 리스트</title>
+</head>
+<body>
+  <h1>제품 목록</h1>
+  {% for product in products %}
+    <div style="margin-bottom:20px;">
+      <h2>
+        <a href="{% url 'product_detail' product.pk %}">
+          {{ product.name }}
+        </a>
+      </h2>
+      <p>{{ product.price }}원</p>
+      <img src="{{ product.image.url }}" width="200" alt="{{ product.name }}">
+    </div>
+  {% endfor %}
+</body>
+</html>
