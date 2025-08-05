@@ -1,10 +1,42 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>{% block title %}anomal 쇼핑몰{% endblock %}</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Custom CSS (optional) -->
+  <link rel="stylesheet" href="{% static 'shop/css/custom.css' %}">
 </head>
-<body>
-$END$
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- 헤더 -->
+  <header class="bg-white shadow">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="/" class="text-2xl font-bold text-indigo-600">anomal</a>
+      <nav class="space-x-4">
+        <a href="/" class="hover:text-indigo-800">홈</a>
+        <a href="#" class="hover:text-indigo-800">카테고리</a>
+        <a href="#" class="hover:text-indigo-800">장바구니</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 메인 컨텐츠 -->
+  <main class="container mx-auto px-6 py-8">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="bg-white border-t mt-12">
+    <div class="container mx-auto px-6 py-6 text-center text-sm text-gray-500">
+      © 2025 anomal. All rights reserved.
+    </div>
+  </footer>
+
 </body>
 </html>

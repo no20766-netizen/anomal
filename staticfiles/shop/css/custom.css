@@ -1,0 +1,55 @@
+/* shop/static/shop/css/custom.css */
+
+/* 브랜드 색상 변수 */
+:root {
+  --brand-indigo: #4f46e5;
+  --brand-indigo-dark: #4338ca;
+  --text-primary: #1f2937;
+  --bg-light: #f9fafb;
+}
+
+/* 바디 기본 스타일 */
+body {
+  background-color: var(--bg-light);
+  color: var(--text-primary);
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 링크 스타일 */
+a {
+  color: var(--brand-indigo);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--brand-indigo-dark);
+}
+
+/* 버튼 스타일 */
+button {
+  background-color: var(--brand-indigo);
+  color: white;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+button:hover {
+  background-color: var(--brand-indigo-dark);
+}
+
+/* 카드 그림자 */
+.shadow {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .05);
+}
+.hover\:shadow-lg:hover {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, .1);
+}
+
+/* 반응형 컨테이너 최대 너비 */
+.max-w-5xl {
+  max-width: 75rem; /* 1200px */
+}
+
+/* 기타 유틸리티 */
+.mt-6 { margin-top: 1.5rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.p-4  { padding: 1rem; }

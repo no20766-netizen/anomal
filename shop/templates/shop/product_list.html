@@ -1,27 +1,22 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>anomal – 제품 리스트</title>
-</head>
-<body>
-  <h1>제품 목록</h1>
-  {% for product in products %}
-    <div style="margin-bottom:20px;">
-      <h2>
+{% extends 'shop/base.html' %}
+{% block title %}제품 목록 | anomal{% endblock %}
+{% block content %}
+  <h1 class="text-3xl font-semibold mb-6">제품 목록</h1>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    {% for product in products %}
+      <div class="bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden">
         <a href="{% url 'product_detail' product.pk %}">
-          {{ product.name }}
+          <img
+            class="w-full h-48 object-cover"
+            src="{% static 'shop/images/' %}{{ product.image.name|cut:'products/' }}"
+            alt="{{ product.name }}"
+          >
+          <div class="p-4">
+            <h2 class="text-xl font-medium text-gray-800">{{ product.name }}</h2>
+            <p class="mt-2 text-indigo-600 font-bold">{{ product.price }}원</p>
+          </div>
         </a>
-      </h2>
-      <p>{{ product.price }}원</p>
-      {# static 경로와 파일명을 분리합니다 #}
-      <img
-        src="{% static 'shop/images/' %}{{ product.image.name|cut:'products/' }}"
-        alt="{{ product.name }}"
-        width="200"
-      >
-    </div>
-  {% endfor %}
-</body>
-</html>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
