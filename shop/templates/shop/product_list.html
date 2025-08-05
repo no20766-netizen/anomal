@@ -1,8 +1,9 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>anomal - 제품 리스트</title>
+  <title>anomal – 제품 리스트</title>
 </head>
 <body>
   <h1>제품 목록</h1>
@@ -14,7 +15,12 @@
         </a>
       </h2>
       <p>{{ product.price }}원</p>
-      <img src="{{ product.image.url }}" width="200" alt="{{ product.name }}">
+      {# static 경로와 파일명을 분리합니다 #}
+      <img
+        src="{% static 'shop/images/' %}{{ product.image.name|cut:'products/' }}"
+        alt="{{ product.name }}"
+        width="200"
+      >
     </div>
   {% endfor %}
 </body>
