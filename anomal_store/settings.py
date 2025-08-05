@@ -8,7 +8,7 @@ DEBUG = False
 ALLOWED_HOSTS = [
     'anomal.kr',
     'www.anomal.kr',
-    'anomal.onrender.com',  # Render 서브도메인으로도 접속할 경우
+    'anomal.onrender.com',
 ]
 
 INSTALLED_APPS = [
@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     # 내가 만든 앱
     'shop',
 ]
@@ -38,7 +39,7 @@ ROOT_URLCONF = 'anomal_store.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # 앱 내부의 templates 폴더를 자동 검색
+        'DIRS': [],  # 앱 내부 templates 폴더 자동 검색
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -67,8 +68,14 @@ TIME_ZONE = 'Asia/Seoul'
 USE_I18N = True
 USE_TZ = True
 
+# Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'shop' / 'static',
+]
+
+# Media files (Uploaded by users)
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
