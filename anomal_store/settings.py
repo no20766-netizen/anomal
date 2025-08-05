@@ -1,17 +1,28 @@
 from pathlib import Path
 import os
 
+# ──────────────────────────────────────────────────────────
+# 기본 경로 설정
+# ──────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ──────────────────────────────────────────────────────────
+# 보안 설정
+# ──────────────────────────────────────────────────────────
 SECRET_KEY = 'django-insecure-1234567890'
 DEBUG = False
 ALLOWED_HOSTS = [
     'anomal.kr',
     'www.anomal.kr',
-    'anomal.onrender.com',
+    'anomal.onrender.com',  # Render 서브도메인
 ]
 
+# ──────────────────────────────────────────────────────────
+# 앱 등록
+# ──────────────────────────────────────────────────────────
 INSTALLED_APPS = [
+    # 런서버 시 whitenoise 사용
+    'whitenoise.runserver_nostatic',
     # Django 기본 앱
     'django.contrib.admin',
     'django.contrib.auth',
@@ -20,11 +31,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # 내가 만든 앱
+    # 내 앱
     'shop',
 ]
 
+# ──────────────────────────────────────────────────────────
+# 미들웨어 설정
+# ──────────────────────────────────────────────────────────
 MIDDLEWARE = [
+    # Whitenoise: 정적 파일(RUN) 서빙
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -34,8 +51,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# ──────────────────────────────────────────────────────────
+# URL 및 WSGI 설정
+# ──────────────────────────────────────────────────────────
 ROOT_URLCONF = 'anomal_store.urls'
+WSGI_APPLICATION = 'anomal_store.wsgi.application'
 
+# ──────────────────────────────────────────────────────────
+# 템플릿 설정
+# ──────────────────────────────────────────────────────────
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -52,8 +76,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'anomal_store.wsgi.application'
-
+# ──────────────────────────────────────────────────────────
+# 데이터베이스 설정
+# ──────────────────────────────────────────────────────────
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -61,21 +86,37 @@ DATABASES = {
     }
 }
 
+# ──────────────────────────────────────────────────────────
+# 비밀번호 검증
+# ──────────────────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = []
 
+# ──────────────────────────────────────────────────────────
+# 지역화 설정
+# ──────────────────────────────────────────────────────────
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Seoul'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# ──────────────────────────────────────────────────────────
+# 정적 파일(Static files) 설정
+# ──────────────────────────────────────────────────────────
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'shop' / 'static',
 ]
+# Whitenoise 압축/캐시된 버전 사용
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media files (Uploaded by users)
+# ──────────────────────────────────────────────────────────
+# 미디어 파일(Media files) 설정
+# ──────────────────────────────────────────────────────────
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# ──────────────────────────────────────────────────────────
+# 기본 자동 필드
+# ──────────────────────────────────────────────────────────
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
