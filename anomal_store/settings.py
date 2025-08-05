@@ -5,7 +5,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-1234567890'
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'anomal.kr',
+    'www.anomal.kr',
+    'anomal.onrender.com',  # Render 서브도메인으로도 접속할 경우
+]
 
 INSTALLED_APPS = [
     # Django 기본 앱
