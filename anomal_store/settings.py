@@ -1,3 +1,5 @@
+# anomal_store/settings.py
+
 from pathlib import Path
 import os
 
@@ -11,8 +13,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ──────────────────────────────────────────────────────────
 SECRET_KEY = 'django-insecure-1234567890'
 DEBUG = False
+
 ALLOWED_HOSTS = [
-    'anomal.kr',
+    'anomal.kr',            # 운영 도메인
     'www.anomal.kr',
     'anomal.onrender.com',  # Render 서브도메인
 ]
@@ -21,9 +24,7 @@ ALLOWED_HOSTS = [
 # 앱 등록
 # ──────────────────────────────────────────────────────────
 INSTALLED_APPS = [
-    # 런서버 시 whitenoise 사용
-    'whitenoise.runserver_nostatic',
-    # Django 기본 앱
+    'whitenoise.runserver_nostatic',  # runserver 시에도 static 처리
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -31,18 +32,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # 내 앱
-    'shop',
+    'shop',  # 내 앱
 ]
 
 # ──────────────────────────────────────────────────────────
 # 미들웨어 설정
 # ──────────────────────────────────────────────────────────
 MIDDLEWARE = [
-    # Whitenoise: 정적 파일(RUN) 서빙
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Whitenoise 정적 파일 처리
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -63,7 +62,7 @@ WSGI_APPLICATION = 'anomal_store.wsgi.application'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # 앱 내부 templates 폴더 자동 검색
+        'DIRS': [],  # 앱 내부 templates/ 검색
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -107,8 +106,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'shop' / 'static',
 ]
-# Whitenoise 압축/캐시된 버전 사용
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# manifest 없이도 작동하는 Storage
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # ──────────────────────────────────────────────────────────
 # 미디어 파일(Media files) 설정
