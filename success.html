@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>결제 확인 중…</title>
+  <style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Apple SD Gothic Neo,Noto Sans KR,sans-serif;background:#0b0b0c;color:#f5f5f5;display:grid;place-items:center;height:100vh;margin:0}</style>
+</head>
+<body>
+  <div id="box">결제 확인 중…</div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const paymentKey = params.get('paymentKey');
+    const orderId = params.get('orderId');
+    const amount = Number(params.get('amount'));
+
+    async function confirm(){
+      try{
+        const res = await fetch('/api/toss/confirm',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ paymentKey, orderId, amount })
+        });
+        if(!res.ok){ const t = await res.text(); throw new Error(t||('HTTP '+res.status)); }
+        const data = await res.json();
+        document.getElementById('box').innerHTML = `
+          <h1>결제가 완료되었습니다 ✅</h1>
+          <p>주문번호: ${data.orderId}</p>
+          <p>결제금액: ₩${amount.toLocaleString('ko-KR')}</p>
+          <p>영수증: <a href="${(data.receipt&&data.receipt.url)||'#'}" target="_blank" rel="noopener">열기</a></p>
+          <p><a href="/">메인으로</a></p>
+        `;
+      }catch(err){
+        document.getElementById('box').innerHTML = `<h1>승인 오류 ❌</h1><pre>${(err&&err.message)||err}</pre><p><a href="/checkout.html">다시 시도</a></p>`;
+      }
+    }
+    if(paymentKey && orderId && amount) confirm();
+    else document.getElementById('box').textContent = '필수 파라미터가 없습니다.';
+  </script>
+</body>
+</html>

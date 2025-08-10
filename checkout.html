@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>anomal — Checkout</title>
+  <script src="https://js.tosspayments.com/v1"></script>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Apple SD Gothic Neo,Noto Sans KR,sans-serif;margin:0;background:#0b0b0c;color:#f5f5f5}
+    .wrap{max-width:720px;margin:40px auto;padding:0 16px}
+    .card{background:#141416;border:1px solid #232327;border-radius:16px;padding:16px}
+    label{display:block;margin:8px 0 6px;color:#b9b9c0}
+    input,select,button{width:100%;height:44px;border-radius:10px;border:1px solid #2a2a2f;background:#0f0f11;color:#fff;padding:0 12px}
+    button{cursor:pointer}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Checkout</h1>
+    <div class="card">
+      <label>상품명</label>
+      <input id="name" />
+      <div class="row">
+        <div>
+          <label>색상</label>
+          <input id="color" />
+        </div>
+        <div>
+          <label>수량</label>
+          <input id="qty" type="number" min="1" value="1" />
+        </div>
+      </div>
+      <label style="margin-top:12px">금액(원)</label>
+      <input id="price" type="number" min="0" />
+      <div style="height:14px"></div>
+      <button id="pay">결제하기</button>
+    </div>
+  </div>
+
+  <script>
+    // 페이지 진입 파라미터 채우기
+    const p = new URLSearchParams(location.search);
+    document.getElementById('name').value = p.get('name') || 'Camp Cap — Black';
+    document.getElementById('color').value = p.get('color') || 'Black';
+    document.getElementById('qty').value = p.get('qty') || '1';
+    document.getElementById('price').value = p.get('price') || '29000';
+
+    // Toss client key — 빌드시 주입하거나 아래에 직접 입력
+    const clientKey = (window.PUBLIC_TOSS_CLIENT_KEY) || 'test_ck_xxxxxxxxxxxxxxxxx';
+
+    function uuid(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&0x3|0x8);return v.toString(16)});}
+
+    document.getElementById('pay').addEventListener('click', async ()=>{
+      const name = document.getElementById('name').value.trim();
+      const qty = parseInt(document.getElementById('qty').value||'1',10);
+      const price = parseInt(document.getElementById('price').value||'0',10);
+      const amount = price * qty;
+      const orderId = 'ANOMAL-' + uuid();
+      const orderName = `${name} x${qty}`;
+
+      const tossPayments = TossPayments(clientKey);
+
+      await tossPayments.requestPayment('CARD', {
+        amount: amount,
+        orderId: orderId,
+        orderName: orderName,
+        successUrl: `${location.origin}/success.html`,
+        failUrl: `${location.origin}/fail.html`,
+        card: { useEscrow: false },
+        flowMode: 'DEFAULT'
+      });
+    });
+  </script>
+</body>
+</html>
