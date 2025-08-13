@@ -1,1 +1,215 @@
-<!-- index.html placeholder -->
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>anomal</title>
+  <meta name="description" content="anomal — minimal headwear." />
+  <link rel="icon" href="/favicon.ico" />
+  <style>
+    :root{
+      --bg:#ffffff; --fg:#111111; --muted:#6b7280; --line:#ececec;
+      --black:#000; --white:#fff;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,sans-serif}
+    a{color:inherit;text-decoration:none}
+    img{display:block;max-width:100%}
+    /* Header */
+    .hd{position:sticky;top:0;background:var(--white);z-index:50;border-bottom:1px solid var(--line)}
+    .hdin{max-width:1280px;margin:0 auto;height:72px;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+    .left{display:flex;align-items:center;gap:28px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand img{height:28px;width:auto}
+    .nav{display:flex;gap:18px}
+    .nav a{font-size:13px;letter-spacing:.04em}
+    .right{display:flex;align-items:center;gap:18px}
+    .bag{position:relative;border:1px solid var(--line);padding:8px 12px;border-radius:999px;background:#fff}
+    .bag .badge{position:absolute;top:-6px;right:-6px;background:#000;color:#fff;border-radius:999px;
+      font-size:11px;line-height:1;padding:4px 6px;min-width:18px;text-align:center;display:none}
+    /* Layout blocks */
+    .wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+    .blank{height:70vh;display:flex;align-items:center;justify-content:center;color:#bdbdbd}
+    /* Shop grid */
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:48px;margin:40px 0 80px}
+    .item .ph{aspect-ratio:3/4;object-fit:cover;background:#f6f6f6}
+    .meta{margin-top:10px;font-size:12px;letter-spacing:.02em}
+    .meta .name{font-weight:600}
+    .meta .price{margin-top:2px;color:#111}
+    /* PDP */
+    .pdp{display:grid;grid-template-columns:1.2fr .8fr;gap:40px;margin:40px 0 80px}
+    .pdp .big{border:1px solid var(--line)}
+    .pdp h1{margin:0 0 8px;font-size:20px}
+    .pdp .price{font-weight:700;margin-bottom:14px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 16px;border-radius:12px;border:1px solid #111;background:#111;color:#fff;cursor:pointer}
+    .btn.ghost{background:#fff;color:#111}
+    .btn.full{width:100%}
+    .stack{display:grid;gap:10px}
+    /* Add-to-bag black panel */
+    .mini{position:fixed;top:20px;right:20px;width:320px;background:#000;color:#fff;border:2px solid #000;
+      border-radius:12px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.2);opacity:0;transform:translateY(-8px);
+      pointer-events:none;transition:opacity .2s, transform .2s;z-index:60}
+    .mini.show{opacity:1;transform:translateY(0);pointer-events:auto}
+    .mini h4{margin:0 0 6px;font-size:14px;letter-spacing:.03em}
+    .mini .row{display:flex;align-items:center;gap:10px}
+    .mini img{width:54px;height:54px;object-fit:cover;border:1px solid #333}
+    .mini .name{font-size:13px}
+    .mini .price{font-size:12px;color:#cfcfcf}
+    .mini .btn{height:38px;border-radius:10px}
+    .mini .btn.ghost{border-color:#fff;color:#fff}
+    /* Footer */
+    .ft{border-top:1px solid var(--line);padding:28px 0 60px;text-align:center;color:#a3a3a3;font-size:12px}
+    @media(max-width:960px){
+      .grid{grid-template-columns:repeat(2,1fr);gap:28px}
+      .pdp{grid-template-columns:1fr}
+    }
+    @media(max-width:560px){
+      .grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <header class="hd">
+    <div class="hdin">
+      <div class="left">
+        <a href="/" class="brand" aria-label="home">
+          <img src="/img/logo-black.jpg" alt="anomal logo" />
+        </a>
+        <nav class="nav">
+          <a href="/?view=shop">SHOP</a>
+          <a href="/?view=features">FEATURES</a>
+          <a href="/?view=support">SUPPORT</a>
+        </nav>
+      </div>
+      <div class="right">
+        <a id="searchBtn" href="#" aria-label="search" style="font-size:12px;color:#6b7280">SEARCH</a>
+        <button id="bagBtn" class="bag" type="button">BAG <span id="bagCount" class="badge">0</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap" id="main">
+    <div class="blank">HOME</div>
+  </main>
+
+  <footer class="ft">© <span id="yy"></span> anomal</footer>
+
+  <!-- Add-to-bag black panel -->
+  <aside id="mini" class="mini" aria-live="polite">
+    <h4>쇼핑백에 추가하기…</h4>
+    <div class="row" style="margin-bottom:10px">
+      <img id="miniImg" src="" alt="thumbnail"/>
+      <div>
+        <div id="miniName" class="name"></div>
+        <div id="miniPrice" class="price"></div>
+      </div>
+    </div>
+    <div class="row" style="gap:8px">
+      <a class="btn ghost" href="/?view=shop">쇼핑백 보기</a>
+      <a id="miniCheckout" class="btn" href="#">바로 구매</a>
+    </div>
+  </aside>
+
+  <script>
+    const $ = s => document.querySelector(s);
+    const main = $('#main');
+    const money = n => '₩' + Number(n||0).toLocaleString('ko-KR');
+    const save = (k,v)=> localStorage.setItem(k, JSON.stringify(v));
+    const load = (k,def)=> JSON.parse(localStorage.getItem(k) || JSON.stringify(def));
+    const CART_KEY = 'cartItems';
+
+    const PRODUCTS = {
+      'camp-blue':  { name:'Camp Cap — Blue',  price:59000, img:'/img/cap_blue.jpg'  },
+      'camp-black': { name:'Camp Cap — Black', price:59000, img:'/img/cap_black.jpg' },
+      'camp-navy':  { name:'Camp Cap — Navy',  price:59000, img:'/img/cap_navy.jpg'  },
+      'camp-khaki': { name:'Camp Cap — Khaki', price:59000, img:'/img/cap_khaki.jpg' },
+      'camp-ivory': { name:'Camp Cap — Ivory', price:59000, img:'/img/cap_ivory.jpg' }
+    };
+
+    const updateBagBadge = () => {
+      const n = load(CART_KEY, []).reduce((s,i)=>s+i.qty,0);
+      const b = $('#bagCount'); b.textContent = n;
+      b.style.display = n ? 'inline-flex' : 'none';
+    };
+
+    function addToCart(sku, qty=1){
+      const pd = PRODUCTS[sku]; if(!pd) return;
+      const cart = load(CART_KEY, []);
+      const idx = cart.findIndex(i=> i.sku===sku);
+      if(idx>-1) cart[idx].qty = Math.min(99, cart[idx].qty + qty);
+      else cart.push({ sku, name: pd.name, price: pd.price, qty, img: pd.img });
+      save(CART_KEY, cart); updateBagBadge();
+      // show mini panel
+      $('#miniImg').src = pd.img; $('#miniName').textContent = pd.name; $('#miniPrice').textContent = money(pd.price);
+      const payload = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify([{ sku, name: pd.name, price: pd.price, qty:1, img: pd.img }])))));
+      $('#miniCheckout').href = '/checkout.html?cart=' + payload;
+      $('#mini').classList.add('show');
+      setTimeout(()=> $('#mini').classList.remove('show'), 2500);
+    }
+
+    function renderShop(){
+      const keys = Object.keys(PRODUCTS);
+      const cards = keys.map(sku=>{
+        const p = PRODUCTS[sku];
+        return `<article class="item">
+          <a href="/?view=detail&sku=${encodeURIComponent(sku)}">
+            <img class="ph" src="${p.img}" alt="${p.name}"/>
+          </a>
+          <div class="meta">
+            <div class="name">${p.name}</div>
+            <div class="price">${money(p.price)}</div>
+          </div>
+        </article>`;
+      }).join('');
+      main.innerHTML = `<section style="margin-top:24px"></section><section class="grid">${cards}</section>`;
+      $$('img').forEach(img=> img.loading='lazy');
+    }
+
+    function renderPDP(sku){
+      const p = PRODUCTS[sku];
+      if(!p){ main.innerHTML = '<div class="blank">상품을 찾을 수 없습니다.</div>'; return; }
+      main.innerHTML = `<section class="pdp">
+        <div class="big"><img src="${p.img}" alt="${p.name}" style="width:100%;height:auto"/></div>
+        <div>
+          <h1>${p.name}</h1>
+          <div class="price">${money(p.price)}</div>
+          <div class="stack" style="margin:16px 0">
+            <button id="btnAdd" class="btn full" type="button">쇼핑백에 추가</button>
+            <button id="btnBuy" class="btn full" type="button">바로 구매</button>
+          </div>
+          <div style="font-size:12px;color:#6b7280">7만 원 이상 구매 시 무료 배송</div>
+        </div>
+      </section>`;
+      $('#btnAdd').addEventListener('click', ()=> addToCart(sku, 1));
+      $('#btnBuy').addEventListener('click', ()=>{
+        const payload = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify([{ sku, name:p.name, price:p.price, qty:1, img:p.img }])))));
+        location.href = '/checkout.html?cart=' + payload;
+      });
+    }
+
+    function renderFeatures(){
+      main.innerHTML = `<div class="blank">FEATURES</div>`;
+    }
+    function renderSupport(){
+      main.innerHTML = `<div class="blank">SUPPORT</div>`;
+    }
+
+    function route(){
+      const q = new URLSearchParams(location.search);
+      const view = q.get('view');
+      if(!view){ main.innerHTML = '<div class="blank"></div>'; return; }
+      if(view==='shop'){ renderShop(); return; }
+      if(view==='detail'){ renderPDP(q.get('sku')); return; }
+      if(view==='features'){ renderFeatures(); return; }
+      if(view==='support'){ renderSupport(); return; }
+      main.innerHTML = '<div class="blank"></div>';
+    }
+
+    const $$ = s => Array.from(document.querySelectorAll(s));
+    updateBagBadge(); route();
+    window.addEventListener('popstate', route);
+    document.getElementById('yy').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
