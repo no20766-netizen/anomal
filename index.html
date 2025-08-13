@@ -6,18 +6,32 @@
   <title>anomal</title>
   <meta name="description" content="anomal — minimal headwear." />
   <link rel="icon" href="/favicon.ico" />
+  <!-- Hip, simple Korean-friendly font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    @font-face{
+      font-family:'Pretendard Variable';
+      font-weight:45 920;
+      font-style:normal;
+      font-display:swap;
+      src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/woff2/PretendardVariable.woff2') format('woff2-variations');
+    }
     :root{
-      --bg:#ffffff; --fg:#111111; --muted:#6b7280; --line:#ececec;
+      --bg:#ffffff; --fg:#0a0a0a; --muted:#6b7280; --line:#e5e7eb;
       --black:#000; --white:#fff;
+      --ship_free_threshold:70000; --ship_fee:3000;
     }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);
-      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,sans-serif}
+      font-family:"Pretendard Variable","Space Grotesk",Inter,system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,sans-serif}
     a{color:inherit;text-decoration:none}
     img{display:block;max-width:100%}
+    /* Square aesthetic */
+    .square{border-radius:0}
     /* Header */
-    .hd{position:sticky;top:0;background:var(--white);z-index:60;border-bottom:1px solid var(--line)}
+    .hd{position:sticky;top:0;background:var(--white);z-index:70;border-bottom:1px solid var(--line)}
     .hdin{max-width:1280px;margin:0 auto;height:72px;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
     .left{display:flex;align-items:center;gap:28px}
     .brand{display:flex;align-items:center;gap:12px}
@@ -25,61 +39,64 @@
     .nav{display:flex;gap:18px}
     .nav a{font-size:13px;letter-spacing:.04em}
     .right{display:flex;align-items:center;gap:18px}
-    .bag{position:relative;border:1px solid var(--line);padding:8px 12px;border-radius:999px;background:#fff;cursor:pointer}
+    .bag{position:relative;border:1px solid var(--line);padding:8px 12px;border-radius:0;background:#fff;cursor:pointer}
     .bag .badge{position:absolute;top:-6px;right:-6px;background:#000;color:#fff;border-radius:999px;
       font-size:11px;line-height:1;padding:4px 6px;min-width:18px;text-align:center;display:none}
     /* Layout blocks */
     .wrap{max-width:1280px;margin:0 auto;padding:0 24px}
     /* Fullscreen carousel */
     .carousel{height:calc(100vh - 72px);position:relative;overflow:hidden}
-    .slides{height:100%;display:flex;transition:transform .5s ease}
+    .slides{height:100%;display:flex;transition:transform .45s ease}
     .slide{min-width:100%;height:100%;display:grid;place-items:center;background:#fff}
-    .slide img{width:100%;height:100%;object-fit:contain}
-    .ctrl{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:999px;border:1px solid #d1d5db;background:rgba(255,255,255,.8);display:grid;place-items:center;cursor:pointer}
+    .slide img{width:66vw;max-width:980px;height:auto;object-fit:contain}
+    .ctrl{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:0;border:1px solid #0a0a0a;background:rgba(255,255,255,.9);display:grid;place-items:center;cursor:pointer}
     .ctrl.prev{left:14px} .ctrl.next{right:14px}
     /* Shop grid */
     .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:48px;margin:40px 0 80px}
-    .item .ph{aspect-ratio:3/4;object-fit:cover;background:#f6f6f6}
+    .item .ph{aspect-ratio:3/4;object-fit:cover;background:#f6f6f6;border:1px solid #e5e7eb;border-radius:0}
     .meta{margin-top:10px;font-size:12px;letter-spacing:.02em}
     .meta .name{font-weight:600}
     .meta .price{margin-top:2px;color:#111}
     /* PDP */
     .pdp{display:grid;grid-template-columns:1.2fr .8fr;gap:40px;margin:40px 0 80px}
-    .pdp .big{border:1px solid var(--line)}
-    .pdp h1{margin:0 0 8px;font-size:20px}
+    .pdp .big{border:1px solid var(--line);border-radius:0}
+    .pdp h1{margin:0 0 8px;font-size:20px;font-weight:600}
     .pdp .price{font-weight:700;margin-bottom:14px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 16px;border-radius:12px;border:1px solid #111;background:#111;color:#fff;cursor:pointer}
+    .btn{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 16px;border-radius:0;border:1px solid #111;background:#111;color:#fff;cursor:pointer}
     .btn.ghost{background:#fff;color:#111}
     .btn.full{width:100%}
     .stack{display:grid;gap:10px}
     /* Add-to-bag black panel */
     .mini{position:fixed;top:20px;right:20px;width:340px;background:#000;color:#fff;border:2px solid #000;
-      border-radius:12px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.2);opacity:0;transform:translateY(-8px);
-      pointer-events:none;transition:opacity .2s, transform .2s;z-index:80}
+      border-radius:0;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.2);opacity:0;transform:translateY(-8px);
+      pointer-events:none;transition:opacity .2s, transform .2s;z-index:90}
     .mini.show{opacity:1;transform:translateY(0);pointer-events:auto}
     .mini h4{margin:0 0 6px;font-size:14px;letter-spacing:.03em}
     .mini .row{display:flex;align-items:center;gap:10px}
     .mini img{width:54px;height:54px;object-fit:cover;border:1px solid #333}
     .mini .name{font-size:13px}
     .mini .price{font-size:12px;color:#cfcfcf}
-    .mini .btn{height:38px;border-radius:10px}
+    .mini .btn{height:38px}
     .mini .btn.ghost{background:transparent;border:1px solid #fff;color:#fff}
     /* Drawer (bag) */
-    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:70}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:80}
     .overlay.show{opacity:1;pointer-events:auto}
-    .drawer{position:fixed;top:0;right:-520px;width:520px;height:100vh;background:#fff;border-left:1px solid #e5e7eb;transition:right .3s ease;z-index:75;display:flex;flex-direction:column}
+    .drawer{position:fixed;top:0;right:-520px;width:520px;height:100vh;background:#fff;border-left:1px solid #e5e7eb;transition:right .3s ease;z-index:85;display:flex;flex-direction:column}
     .drawer.show{right:0}
     .drawer header{padding:18px 16px;border-bottom:1px solid #ececec;font-weight:600}
     .drawer .items{flex:1;overflow:auto;padding:16px}
     .drawer .row{display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;margin-bottom:12px}
-    .qty{display:inline-flex;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden}
+    .qty{display:inline-flex;border:1px solid #e5e7eb;border-radius:0;overflow:hidden}
     .qty button{width:28px;height:28px;border:0;background:#fff;cursor:pointer}
     .qty span{display:inline-flex;align-items:center;justify-content:center;width:34px}
     .drawer footer{border-top:1px solid #ececec;padding:12px 16px}
-    .drawer .btn{height:46px;border-radius:12px}
     .muted{color:#6b7280;font-size:12px}
-    /* Footer */
-    .ft{border-top:1px solid var(--line);padding:28px 0 60px;text-align:center;color:#a3a3a3;font-size:12px}
+    .sum{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:4px}
+    .coupon{display:grid;grid-template-columns:1fr auto;gap:8px;margin:10px 0}
+    .coupon input{height:40px;border:1px solid #e5e7eb;padding:0 10px;border-radius:0}
+    /* Undo toast */
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 14px;border-radius:0;border:1px solid #000;opacity:0;pointer-events:none;transition:opacity .2s;z-index:95}
+    .toast.show{opacity:1}
     @media(max-width:960px){
       .grid{grid-template-columns:repeat(2,1fr);gap:28px}
       .pdp{grid-template-columns:1fr}
@@ -87,6 +104,7 @@
     }
     @media(max-width:560px){
       .grid{grid-template-columns:1fr}
+      .slide img{width:86vw}
     }
   </style>
 </head>
@@ -102,7 +120,7 @@
         </nav>
       </div>
       <div class="right">
-        <button id="bagBtn" class="bag" type="button">BAG <span id="bagCount" class="badge">0</span></button>
+        <button id="bagBtn" class="bag square" type="button">BAG <span id="bagCount" class="badge">0</span></button>
       </div>
     </div>
   </header>
@@ -110,15 +128,17 @@
   <main class="wrap" id="main">
     <section class="carousel" id="carousel">
       <div class="slides" id="slides"></div>
-      <button class="ctrl prev" id="prev" aria-label="previous">‹</button>
-      <button class="ctrl next" id="next" aria-label="next">›</button>
+      <button class="ctrl prev square" id="prev" aria-label="previous">‹</button>
+      <button class="ctrl next square" id="next" aria-label="next">›</button>
     </section>
   </main>
 
-  <footer class="ft">© <span id="yy"></span> anomal</footer>
+  <footer class="ft" style="border-top:1px solid var(--line);padding:28px 0 60px;text-align:center;color:#a3a3a3;font-size:12px">
+    © <span id="yy"></span> anomal
+  </footer>
 
   <!-- Add-to-bag black panel -->
-  <aside id="mini" class="mini" aria-live="polite">
+  <aside id="mini" class="mini square" aria-live="polite">
     <h4>쇼핑백에 추가하기…</h4>
     <div class="row" style="margin-bottom:10px">
       <img id="miniImg" src="" alt="thumbnail"/>
@@ -128,27 +148,35 @@
       </div>
     </div>
     <div class="row" style="gap:8px">
-      <a id="miniBag" class="btn ghost" href="/?view=shop">쇼핑백 보기</a>
-      <a id="miniCheckout" class="btn" href="#">바로 구매</a>
+      <a id="miniBag" class="btn ghost square" href="#">쇼핑백 보기</a>
+      <a id="miniCheckout" class="btn square" href="#">바로 구매</a>
     </div>
   </aside>
 
   <!-- Bag Drawer -->
   <div id="ov" class="overlay"></div>
-  <aside id="drawer" class="drawer" aria-hidden="true">
+  <aside id="drawer" class="drawer square" aria-hidden="true">
     <header>쇼핑백</header>
     <div class="items" id="bagItems"></div>
     <footer>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <span>총 상품금액</span><strong id="bagTotal">₩0</strong>
+      <div class="coupon">
+        <input id="coupon" placeholder="쿠폰 코드 (SAVE10 / WELCOME3 / FREESHIP)" />
+        <button id="applyCoupon" class="btn square" type="button" style="height:40px">적용</button>
       </div>
-      <div class="muted" style="margin-bottom:10px">7만 원 이상 구매 시 무료 배송 · 배송비는 다음 단계에서 적용됩니다.</div>
+      <div class="sum"><span>소계</span><strong id="sumSubtotal">₩0</strong></div>
+      <div class="sum"><span>할인</span><strong id="sumDiscount">-₩0</strong></div>
+      <div class="sum"><span>배송비</span><strong id="sumShipping">₩0</strong></div>
+      <div class="sum" style="border-top:1px solid #e5e7eb;padding-top:6px"><span>총 결제금액</span><strong id="sumTotal">₩0</strong></div>
+      <div class="muted" id="sumNote" style="margin:6px 0 10px">7만 원 이상 무료 배송 · 쿠폰은 중복 적용되지 않습니다.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <button id="keepShop" class="btn ghost" type="button" style="border-color:#111">계속 쇼핑하기</button>
-        <button id="goCheckout" class="btn" type="button">주문결제</button>
+        <button id="keepShop" class="btn ghost square" type="button" style="border-color:#111">계속 쇼핑하기</button>
+        <button id="goCheckout" class="btn square" type="button">주문결제</button>
       </div>
     </footer>
   </aside>
+
+  <!-- Undo toast -->
+  <div id="toast" class="toast square">삭제됨. <button id="undo" class="btn ghost square" style="height:28px;border-color:#fff;color:#fff;margin-left:8px">실행취소</button></div>
 
   <script>
     const $ = s => document.querySelector(s);
@@ -158,6 +186,9 @@
     const save = (k,v)=> localStorage.setItem(k, JSON.stringify(v));
     const load = (k,def)=> JSON.parse(localStorage.getItem(k) || JSON.stringify(def));
     const CART_KEY = 'cartItems';
+    const COUPON_KEY = 'cartCoupon';
+    const FREE = Number(getComputedStyle(document.documentElement).getPropertyValue('--ship_free_threshold').trim()) || 70000;
+    const SHIP = Number(getComputedStyle(document.documentElement).getPropertyValue('--ship_fee').trim()) || 3000;
 
     const PRODUCTS = {
       'camp-blue':  { name:'Camp Cap — Blue',  price:59000, img:'/img/cap_blue.jpg'  },
@@ -183,6 +214,7 @@
       $('#mini').classList.add('show');
       setTimeout(()=> $('#mini').classList.remove('show'), 2500);
     }
+    $('#miniBag').addEventListener('click', (e)=>{ e.preventDefault(); openDrawer(); });
 
     // ===== Cart helpers =====
     function getCart(){ return load(CART_KEY, []); }
@@ -195,22 +227,60 @@
       setCart(cart); showMini({sku, ...p});
     }
 
+    // ===== Coupon logic =====
+    function getCoupon(){ return (load(COUPON_KEY, null)); }
+    function setCoupon(code){ save(COUPON_KEY, code); renderDrawer(); }
+    function calcDiscount(subtotal, code){
+      if(!code) return 0;
+      if(code.toUpperCase()==='SAVE10') return Math.floor(subtotal*0.10);
+      if(code.toUpperCase()==='WELCOME3') return 3000;
+      if(code.toUpperCase()==='FREESHIP') return 0; // handled in shipping
+      return 0;
+    }
+    function calcShipping(subtotal, code){
+      if(subtotal>=FREE) return 0;
+      if(code && code.toUpperCase()==='FREESHIP') return 0;
+      return SHIP;
+    }
+
     // ===== Drawer =====
     const ov = $('#ov'); const dr = $('#drawer');
-    function openDrawer(){ ov.classList.add('show'); dr.classList.add('show'); }
+    function openDrawer(){ ov.classList.add('show'); dr.classList.add('show'); renderDrawer(); }
     function closeDrawer(){ ov.classList.remove('show'); dr.classList.remove('show'); }
     $('#bagBtn').addEventListener('click', openDrawer);
     $('#keepShop').addEventListener('click', closeDrawer);
     ov.addEventListener('click', closeDrawer);
+    $('#applyCoupon').addEventListener('click', ()=>{ const c = $('#coupon').value.trim(); setCoupon(c||null); });
+
+    let lastRemoved = null; let toastTimer = null;
+    const toast = $('#toast'); const undoBtn = $('#undo');
+    function showToast(){ clearTimeout(toastTimer); toast.classList.add('show'); toastTimer=setTimeout(()=>toast.classList.remove('show'), 4000); }
+    undoBtn.addEventListener('click', ()=>{
+      if(!lastRemoved) return;
+      const cart = getCart();
+      cart.splice(lastRemoved.index, 0, lastRemoved.item);
+      lastRemoved = null; setCart(cart);
+      toast.classList.remove('show');
+    });
 
     function renderDrawer(){
       const items = getCart(); const el = $('#bagItems');
-      if(!items.length){ el.innerHTML = '<p class="muted">담긴 상품이 없습니다.</p>'; $('#bagTotal').textContent = money(0); return; }
-      let total = 0;
+      const code = getCoupon();
+      if(code) $('#coupon').value = code;
+      if(!items.length){
+        el.innerHTML = '<p class="muted">담긴 상품이 없습니다.</p>';
+        $('#sumSubtotal').textContent = money(0);
+        $('#sumDiscount').textContent = '-'+money(0).slice(1);
+        $('#sumShipping').textContent = money(0);
+        $('#sumTotal').textContent = money(0);
+        $('#sumNote').textContent = '7만 원 이상 무료 배송 · 쿠폰은 중복 적용되지 않습니다.';
+        return;
+      }
+      let subtotal = 0;
       el.innerHTML = items.map((it,idx)=>{
-        const line = it.price * it.qty; total += line;
+        const line = it.price * it.qty; subtotal += line;
         return `<div class="row">
-          <img src="${it.img}" alt="${it.name}" style="width:72px;height:72px;object-fit:cover;border:1px solid #e5e7eb;border-radius:8px"/>
+          <img src="${it.img}" alt="${it.name}" style="width:72px;height:72px;object-fit:cover;border:1px solid #e5e7eb"/>
           <div>
             <div style="font-weight:600">${it.name}</div>
             <div class="muted" style="margin:4px 0">수량 
@@ -227,16 +297,39 @@
           </div>
         </div>`;
       }).join('');
-      $('#bagTotal').textContent = money(total);
+      const discount = calcDiscount(subtotal, code);
+      const shipping = calcShipping(subtotal - discount, code);
+      const total = Math.max(0, subtotal - discount) + shipping;
+      $('#sumSubtotal').textContent = money(subtotal);
+      $('#sumDiscount').textContent = '-' + money(discount).slice(1);
+      $('#sumShipping').textContent = money(shipping);
+      $('#sumTotal').textContent = money(total);
+      $('#sumNote').textContent = (shipping===0 ? '무료 배송 적용됨 · ' : '') + '쿠폰은 중복 적용되지 않습니다.';
     }
 
     $('#bagItems').addEventListener('click', (e)=>{
-      const idx = e.target.dataset.idx;
-      if(idx===undefined) return;
+      const idxRaw = e.target.dataset.idx;
+      if(idxRaw===undefined) return;
+      const idx = Number(idxRaw);
       const items = getCart();
-      if(e.target.classList.contains('qminus')){ items[idx].qty = Math.max(1, items[idx].qty-1); setCart(items); }
+      if(e.target.classList.contains('qminus')){
+        items[idx].qty = items[idx].qty - 1;
+        if(items[idx].qty<=0){
+          lastRemoved = { index: idx, item: items[idx] };
+          items.splice(idx,1);
+          setCart(items);
+          showToast();
+          return;
+        }
+        setCart(items);
+      }
       if(e.target.classList.contains('qplus')){ items[idx].qty = Math.min(99, items[idx].qty+1); setCart(items); }
-      if(e.target.classList.contains('remove')){ items.splice(idx,1); setCart(items); }
+      if(e.target.classList.contains('remove')){
+        lastRemoved = { index: idx, item: items[idx] };
+        items.splice(idx,1);
+        setCart(items);
+        showToast();
+      }
     });
 
     $('#goCheckout').addEventListener('click', ()=>{
@@ -272,8 +365,8 @@
           <h1>${p.name}</h1>
           <div class="price">${money(p.price)}</div>
           <div class="stack" style="margin:16px 0">
-            <button id="btnAdd" class="btn full" type="button">쇼핑백에 추가</button>
-            <button id="btnBuy" class="btn full" type="button">바로 구매</button>
+            <button id="btnAdd" class="btn full square" type="button">쇼핑백에 추가</button>
+            <button id="btnBuy" class="btn full square" type="button">바로 구매</button>
           </div>
           <div style="font-size:12px;color:#6b7280">7만 원 이상 구매 시 무료 배송</div>
         </div>
@@ -288,16 +381,26 @@
     function renderHome(){
       main.innerHTML = `<section class="carousel" id="carousel">
         <div class="slides" id="slides"></div>
-        <button class="ctrl prev" id="prev" aria-label="previous">‹</button>
-        <button class="ctrl next" id="next" aria-label="next">›</button>
+        <button class="ctrl prev square" id="prev" aria-label="previous">‹</button>
+        <button class="ctrl next square" id="next" aria-label="next">›</button>
       </section>`;
       const slides = $('#slides');
       slides.innerHTML = HOME_SLIDES.map(src=>`<div class="slide"><img src="${src}" alt="slide"/></div>`).join('');
-      let idx = 0;
+      let idx = 0, startX=null, deltaX=0;
       const go = (n)=>{ idx = (n + HOME_SLIDES.length) % HOME_SLIDES.length; slides.style.transform = `translateX(-${idx*100}%)`; };
       $('#prev').onclick = ()=> go(idx-1);
       $('#next').onclick = ()=> go(idx+1);
-      setInterval(()=> go(idx+1), 4000);
+      const threshold = 40;
+      const touchStart = (x)=>{ startX = x; deltaX=0; };
+      const touchMove = (x)=>{ if(startX===null) return; deltaX = x - startX; };
+      const touchEnd = ()=>{ if(Math.abs(deltaX) > threshold){ if(deltaX<0) go(idx+1); else go(idx-1); } startX=null; };
+      slides.addEventListener('touchstart', e=> touchStart(e.touches[0].clientX), {passive:true});
+      slides.addEventListener('touchmove', e=> touchMove(e.touches[0].clientX), {passive:true});
+      slides.addEventListener('touchend', touchEnd);
+      slides.addEventListener('pointerdown', e=> touchStart(e.clientX));
+      slides.addEventListener('pointermove', e=> touchMove(e.clientX));
+      slides.addEventListener('pointerup', touchEnd);
+      setInterval(()=> go(idx+1), 5000);
     }
 
     function route(){

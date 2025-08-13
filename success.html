@@ -4,12 +4,22 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Order Success — anomal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    @font-face{
+      font-family:'Pretendard Variable';
+      font-weight:45 920;
+      font-style:normal;
+      font-display:swap;
+      src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/woff2/PretendardVariable.woff2') format('woff2-variations');
+    }
     :root{ --bg:#ffffff; --fg:#0f172a; --muted:#64748b; --line:#e5e7eb }
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:#fff;color:var(--fg);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,sans-serif}
+    html,body{margin:0;padding:0;background:#fff;color:var(--fg);font-family:"Pretendard Variable","Space Grotesk",Inter,system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,sans-serif}
     .wrap{max-width:760px;margin:0 auto;padding:32px}
-    .card{border:1px solid var(--line);border-radius:16px;background:#fff;padding:16px}
+    .card{border:1px solid var(--line);border-radius:0;background:#fff;padding:16px}
     table{width:100%;border-collapse:collapse}
     th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
   </style>
@@ -34,7 +44,7 @@
     if(!data||!data.items||!data.items.length){ $('#items').innerHTML='<p style="color:#64748b">주문 상품 정보가 없습니다.</p>'; }
     else{ let total=0; const rows=data.items.map(it=>{ const line=it.price*it.qty; total+=line; return `
       <tr>
-        <td style="width:64px"><img src="${it.img}" alt="${it.name}" style="width:64px;height:64px;object-fit:cover;border:1px solid #e5e7eb;border-radius:8px"/></td>
+        <td style="width:64px"><img src="${it.img}" alt="${it.name}" style="width:64px;height:64px;object-fit:cover;border:1px solid #e5e7eb"/></td>
         <td><div style="font-weight:600">${it.name}</div><div style="color:#64748b;font-size:12px">수량 ${it.qty}</div></td>
         <td style="text-align:right">${money(line)}</td>
       </tr>`; }).join('');
