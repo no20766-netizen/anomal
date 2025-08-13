@@ -19,7 +19,7 @@
     }
     :root{
       --bg:#ffffff; --fg:#0a0a0a; --muted:#6b7280; --line:#e5e7eb;
-      --ship_free_threshold:70000; --ship_fee:3000;
+      --ship_free_threshold:50000; --ship_fee:4000;
     }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);
@@ -171,8 +171,8 @@
     const PRODUCTS = {
       'camp-blue':  { name:'Camp Cap — Blue',  price:59000, img:'/img/campcap_blue.jpg'  },
       'camp-black': { name:'Camp Cap — Black', price:59000, img:'/img/campcap_black.jpg' },
-      'ball-red':   { name:'Ball Cap — Red',   price:59000, img:'/img/ballcap_red.jpg'   },
-      'ball-black': { name:'Ball Cap — Black', price:59000, img:'/img/ballcap_black.jpg' }
+      'ball-red':   { name:'Ball Cap — Red',   price:49000, img:'/img/ballcap_red.jpg'   },
+      'ball-black': { name:'Ball Cap — Black', price:49000, img:'/img/ballcap_black.jpg' }
     };
     const HOME_SLIDES = ['/img/cover1.jpg','/img/cover2.jpg','/img/cover3.jpg'];
 
@@ -204,8 +204,7 @@
     }
 
     const COUPON_RULES = {
-      SAVE10:   { type:'percent', value:10,  min:0,      freeShip:false, expires:'2099-12-31' },
-      WELCOME3: { type:'flat',    value:3000,min:0,      freeShip:false, expires:'2099-12-31' },
+      anomal10:   { type:'percent', value:10,  min:0,      freeShip:false, expires:'2099-12-31' },
       FREESHIP: { type:'flat',    value:0,   min:0,      freeShip:true,  expires:'2099-12-31' },
     };
     function getRule(code){
