@@ -13,50 +13,74 @@
   <meta property="og:url" content="https://anomal.kr/" />
   <link rel="icon" href="/favicon.ico" />
   <style>
-    :root{
-      --bg:#ffffff; --fg:#111111; --muted:#6b7280; --card:#ffffff; --line:#e5e7eb; --accent:#111111;
-      --ok:#13c27a; --warn:#f0b429;
-    }
+    :root{ --bg:#ffffff; --fg:#111111; --muted:#6b7280; --card:#ffffff; --line:#e5e7eb; --accent:#111111; --ok:#13c27a; --warn:#f0b429; }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Apple SD Gothic Neo, Noto Sans KR, sans-serif}
     a{color:inherit;text-decoration:none}
     img{display:block;max-width:100%}
     .wrap{max-width:1150px;margin:0 auto;padding:0 20px}
-    .hd{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);z-index:10}
+    .hd{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);z-index:20}
     .hdin{display:flex;align-items:center;justify-content:space-between;height:68px;gap:16px}
     .brand{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
     .brand img{height:34px;width:auto}
-    .nav{display:flex;gap:18px}
+    .nav{display:flex;gap:18px;align-items:center}
     .nav a{font-size:14px;color:var(--muted)}
     .cta{border:1px solid var(--fg);padding:8px 12px;border-radius:999px;font-size:14px}
+    .cartbtn{position:relative;border:1px solid var(--line);padding:8px 12px;border-radius:999px;background:#fff}
+    .badge{position:absolute;top:-6px;right:-6px;background:#111;color:#fff;border-radius:999px;font-size:11px;line-height:1;padding:4px 6px;min-width:18px;text-align:center}
+
     .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:center;padding:56px 0;border-bottom:1px solid var(--line)}
     .hero .img{aspect-ratio:4/3;border-radius:24px;overflow:hidden;background:#f3f4f6;display:flex;align-items:center;justify-content:center}
     .hero h1{font-size:36px;margin:0 0 12px}
     .hero p{color:var(--muted);margin:0 0 20px;line-height:1.6}
     .hero .btns{display:flex;gap:10px;flex-wrap:wrap}
     .btn{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);cursor:pointer}
-    .btn.prime{border-color:var(--fg);background:var(--fg);color:#fff}
+    .btn.prime{border-color:#111;background:#111;color:#fff}
     .btn.ghost{background:#fff}
+
     .sec{padding:42px 0}
     .sec h2{font-size:20px;margin:0 0 14px}
     .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .12s ease, box-shadow .12s ease}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .12s ease, box-shadow .12s ease;position:relative}
     .card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.06)}
     .ph{aspect-ratio:1/1;background:#fafafa;object-fit:cover}
     .meta{padding:12px 12px 16px}
     .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
     .name{font-weight:600}
-    .price{color:#111;font-weight:600}
+    .price{color:#111;font-weight:700}
     .badges{display:flex;gap:8px;margin-top:8px;color:#6b7280;font-size:12px}
-    .buy{margin-top:10px}
-    .buy .btn{width:100%; background:#111; color:#fff; border:1px solid #111}
+    .stock{position:absolute;left:12px;top:12px;background:#111;color:#fff;font-size:12px;padding:4px 8px;border-radius:999px}
+    .buy{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .buy .btn{width:100%}
+
     .reviews{display:grid;grid-template-columns:1fr;gap:12px}
     .rv{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff}
     .rv .stars{font-size:14px;color:var(--warn)}
     .rv .txt{color:var(--muted);font-size:14px;line-height:1.6}
+
     .ft{border-top:1px solid var(--line);padding:28px 0 64px;color:#6b7280;font-size:13px;text-align:center}
-    @media(max-width:900px){ .hero{grid-template-columns:1fr} .grid{grid-template-columns:1fr} }
-    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:#fff;border:1px solid #000;padding:10px 14px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .25s}
+
+    /* Drawer/Modal */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+    .overlay.show{opacity:1;pointer-events:auto}
+    .drawer{position:fixed;right:-420px;top:0;height:100vh;width:400px;background:#fff;border-left:1px solid var(--line);box-shadow:-10px 0 30px rgba(0,0,0,.08);transition:right .25s;z-index:50;display:flex;flex-direction:column}
+    .drawer.show{right:0}
+    .drawer h3{margin:0;padding:18px 16px;border-bottom:1px solid var(--line)}
+    .drawer .content{flex:1;overflow:auto;padding:16px}
+    .drawer .row{display:flex;align-items:center;justify-content:space-between}
+    .qty{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+    .qty button{width:28px;height:28px;border:0;background:#fff}
+    .qty span{display:inline-flex;align-items:center;justify-content:center;width:34px}
+    .drawer .foot{border-top:1px solid var(--line);padding:12px 16px}
+
+    .modal{position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
+    .modal.show{opacity:1;pointer-events:auto}
+    .modal .box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;min-width:320px}
+    .modal .box h3{margin:0 0 10px}
+    .modal .box label{display:block;font-size:13px;color:#6b7280;margin:8px 0 4px}
+    .modal .box input{width:100%;height:40px;border:1px solid var(--line);border-radius:10px;padding:0 10px}
+
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:#fff;border:1px solid #000;padding:10px 14px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:70}
     .toast.show{opacity:1}
   </style>
 </head>
@@ -72,8 +96,9 @@
         <a href="#about">About</a>
         <a href="#reviews">Reviews</a>
         <a href="#cs">Policy</a>
+        <button id="loginBtn" class="cta" type="button">로그인</button>
+        <button id="cartBtn" class="cartbtn" type="button">장바구니 <span id="cartCount" class="badge" style="display:none">0</span></button>
       </nav>
-      <a class="cta" href="/?view=shop" target="_blank" rel="noopener">바로 보기</a>
     </div>
   </header>
 
@@ -88,6 +113,7 @@
         <div class="btns">
           <a class="btn prime" href="/?view=shop" target="_blank" rel="noopener">바로 보기</a>
           <a class="btn ghost" href="https://www.instagram.com/yourbrand" target="_blank" rel="noopener">Instagram</a>
+          <div style="font-size:12px;color:#6b7280">지금 주문 시 <span id="etaText">도착 예정일 계산중…</span></div>
         </div>
       </div>
     </section>
@@ -95,7 +121,8 @@
     <section id="shop" class="sec">
       <h2>Shop</h2>
       <div class="grid">
-        <article class="card" data-sku="camp-blue" data-price="59000" data-name="Camp Cap — Blue">
+        <article class="card" data-sku="camp-blue" data-price="59000" data-name="Camp Cap — Blue" data-color="Blue" data-stock="7">
+          <span class="stock">재고 7</span>
           <img class="ph" src="/img/cap_blue.jpg" alt="Camp Cap — Blue" />
           <div class="meta">
             <div class="row">
@@ -104,11 +131,13 @@
             </div>
             <div class="badges"><span>🚚 평일 14시 이전 당일출고</span><span>↩ 7일 이내 교환·반품</span></div>
             <div class="buy">
-              <button class="btn checkout" data-color="Blue">구매하기</button>
+              <button class="btn addcart">장바구니</button>
+              <button class="btn prime checkout">바로구매</button>
             </div>
           </div>
         </article>
-        <article class="card" data-sku="camp-black" data-price="59000" data-name="Camp Cap — Black">
+        <article class="card" data-sku="camp-black" data-price="59000" data-name="Camp Cap — Black" data-color="Black" data-stock="3">
+          <span class="stock">재고 3</span>
           <img class="ph" src="/img/cap_black.jpg" alt="Camp Cap — Black" />
           <div class="meta">
             <div class="row">
@@ -117,7 +146,8 @@
             </div>
             <div class="badges"><span>🚚 평일 14시 이전 당일출고</span><span>↩ 7일 이내 교환·반품</span></div>
             <div class="buy">
-              <button class="btn checkout" data-color="Black">구매하기</button>
+              <button class="btn addcart">장바구니</button>
+              <button class="btn prime checkout">바로구매</button>
             </div>
           </div>
         </article>
@@ -126,15 +156,32 @@
 
     <section id="about" class="sec">
       <h2>About</h2>
-      <p style="color:var(--muted);line-height:1.75">
-        anomal은 10대·20대를 위한 미니멀 헤드웨어 브랜드입니다. 심플하지만 완성도 높은 디테일에 집중합니다.
-      </p>
+      <p style="color:var(--muted);line-height:1.75">anomal은 10대·20대를 위한 미니멀 헤드웨어 브랜드입니다. 심플하지만 완성도 높은 디테일에 집중합니다.</p>
     </section>
 
     <section id="reviews" class="sec">
       <h2>Reviews</h2>
-      <div class="reviews">
-        <div class="rv"><div class="stars">★★★★★</div><div class="txt">노지훈이 만든 웹사이트</div></div>
+      <div id="reviewList" class="reviews"></div>
+      <div style="margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:12px">
+        <h3 style="margin:0 0 8px;font-size:16px">리뷰 남기기</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+          <select id="revSku" style="height:40px;border:1px solid var(--line);border-radius:10px;padding:0 10px">
+            <option value="camp-blue">Camp Cap — Blue</option>
+            <option value="camp-black">Camp Cap — Black</option>
+          </select>
+          <select id="revStar" style="height:40px;border:1px solid var(--line);border-radius:10px;padding:0 10px">
+            <option value="5">★★★★★ (5)</option>
+            <option value="4">★★★★☆ (4)</option>
+            <option value="3">★★★☆☆ (3)</option>
+            <option value="2">★★☆☆☆ (2)</option>
+            <option value="1">★☆☆☆☆ (1)</option>
+          </select>
+        </div>
+        <textarea id="revText" rows="3" style="width:100%;border:1px solid var(--line);border-radius:10px;padding:8px" placeholder="착용감, 핏, 색감 등 자유롭게 작성"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="revSubmit" class="btn prime" type="button">등록</button>
+          <button id="revClear" class="btn" type="button">모든 리뷰 초기화</button>
+        </div>
       </div>
     </section>
 
@@ -153,94 +200,255 @@
     <div class="wrap">© <span id="yy"></span> anomal. All rights reserved. · <a href="/terms.html">이용약관</a> · <a href="/privacy.html">개인정보처리방침</a></div>
   </footer>
 
-  <div class="toast" id="toast">체크아웃으로 이동합니다…</div>
+  <!-- CART DRAWER -->
+  <div id="ov" class="overlay"></div>
+  <aside id="cart" class="drawer" aria-hidden="true">
+    <h3>장바구니</h3>
+    <div class="content" id="cartItems"></div>
+    <div class="foot">
+      <div class="row" style="margin-bottom:8px"><span>총 상품금액</span><strong id="cartTotal">₩0</strong></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button id="goCheckout" class="btn prime" type="button">체크아웃</button>
+        <button id="clearCart" class="btn" type="button">비우기</button>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:#6b7280">간편결제(데모):
+        <button class="btn" type="button" onclick="toast('카카오페이 준비중')">카카오페이</button>
+        <button class="btn" type="button" onclick="toast('네이버페이 준비중')">네이버페이</button>
+        <button class="btn" type="button" onclick="toast('TossPayments 준비중')">Toss</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- LOGIN MODAL -->
+  <div id="auth" class="modal" aria-hidden="true">
+    <div class="box">
+      <h3>로그인 / 회원가입</h3>
+      <label>이메일</label>
+      <input id="authEmail" type="email" placeholder="you@example.com" />
+      <label>비밀번호</label>
+      <input id="authPw" type="password" placeholder="8자 이상" />
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button id="authLogin" class="btn prime" type="button">로그인</button>
+        <button id="authClose" class="btn" type="button">닫기</button>
+      </div>
+      <p style="color:#6b7280;font-size:12px;margin-top:8px">* 데모용 로컬 저장 방식으로 작동합니다.</p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">알림</div>
 
   <script>
-    document.getElementById('yy').textContent = new Date().getFullYear();
+    // ===== 유틸 =====
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+    const money = n => '₩' + Number(n||0).toLocaleString('ko-KR');
+    const save = (k,v)=> localStorage.setItem(k, JSON.stringify(v));
+    const load = (k,def)=> JSON.parse(localStorage.getItem(k) || JSON.stringify(def));
+    const toast = (t)=>{ const el=$('#toast'); el.textContent=t; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),1200); };
 
-    // 제품 카드 → /checkout.html로 파라미터 전달
-    document.querySelectorAll('.checkout').forEach(btn => {
-      btn.addEventListener('click', (e)=>{
-        e.stopPropagation();
-        const card = e.target.closest('.card');
-        const name = card.dataset.name;
-        const price = parseInt(card.dataset.price, 10);
-        const color = btn.dataset.color || '';
-        const qty = 1;
-        const q = new URLSearchParams({ name, price, color, qty });
-        const toast = document.getElementById('toast');
-        toast.classList.add('show');
-        setTimeout(()=>{ location.href = '/checkout.html?' + q.toString(); }, 300);
-        setTimeout(()=> toast.classList.remove('show'), 1200);
+    // ===== 연도 & ETA =====
+    $('#yy').textContent = new Date().getFullYear();
+    (function setETA(){
+      const now = new Date();
+      const cutoff = new Date(); cutoff.setHours(14,0,0,0);
+      const ship = new Date(now < cutoff ? now : new Date(now.getTime()+86400000)); // 오늘 14시 이전 주문=오늘 출고, 이후=내일 출고
+      const arrive = new Date(ship.getTime()+86400000); // 평균 1일 도착 가정
+      const fmt = d => `${d.getMonth()+1}/${d.getDate()}(평균)`;
+      $('#etaText').textContent = fmt(arrive);
+    })();
+
+    // ===== 로그인(데모) =====
+    const auth = load('auth', null);
+    const loginBtn = $('#loginBtn');
+    const modal = $('#auth');
+    const openAuth = ()=> modal.classList.add('show');
+    const closeAuth = ()=> modal.classList.remove('show');
+    const applyAuthUI = ()=>{
+      const a = load('auth', null);
+      if(a){ loginBtn.textContent = `${a.email.split('@')[0]} 님`; loginBtn.onclick = ()=>{ localStorage.removeItem('auth'); applyAuthUI(); toast('로그아웃되었습니다'); } }
+      else { loginBtn.textContent='로그인'; loginBtn.onclick=openAuth; }
+    };
+    applyAuthUI();
+    $('#authClose').onclick = closeAuth;
+    $('#authLogin').onclick = ()=>{
+      const email=$('#authEmail').value.trim();
+      const pw=$('#authPw').value.trim();
+      if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)) return toast('이메일 형식을 확인하세요');
+      if(pw.length<8) return toast('비밀번호 8자 이상');
+      save('auth',{email}); closeAuth(); applyAuthUI(); toast('로그인 완료');
+    };
+
+    // ===== 장바구니 =====
+    const ov = $('#ov');
+    const cartDr = $('#cart');
+    const cartBtn = $('#cartBtn');
+    const cartCount = $('#cartCount');
+    const cartItemsEl = $('#cartItems');
+    const CART_KEY='cartItems';
+
+    function getCart(){ return load(CART_KEY, []); }
+    function setCart(items){ save(CART_KEY, items); updateCartBadge(); renderCart(); }
+    function updateCartBadge(){ const n=getCart().reduce((s,i)=>s+i.qty,0); cartCount.textContent=n; cartCount.style.display = n? 'inline-flex':'none'; }
+
+    function addToCart(item){
+      const items=getCart();
+      const idx=items.findIndex(i=> i.sku===item.sku);
+      if(idx>-1){ items[idx].qty=Math.min(items[idx].qty+1, 99); }
+      else { items.push({...item, qty:1}); }
+      setCart(items); toast('장바구니에 담았습니다');
+    }
+
+    function renderCart(){
+      const items=getCart();
+      if(items.length===0){ cartItemsEl.innerHTML='<p style="color:#6b7280">담긴 상품이 없습니다.</p>'; $('#cartTotal').textContent=money(0); return; }
+      let html=''; let total=0;
+      items.forEach((it,idx)=>{
+        const line=it.price*it.qty; total+=line;
+        html += `<div style="display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center;margin-bottom:12px">
+          <img src="${it.img}" alt="${it.name}" style="width:60px;height:60px;object-fit:cover;border:1px solid var(--line);border-radius:8px"/>
+          <div>
+            <div style="font-weight:600">${it.name}</div>
+            <div style="color:#6b7280;font-size:12px">색상: ${it.color}</div>
+            <div class="qty" aria-label="수량 조절"><button data-idx="${idx}" class="qminus">-</button><span>${it.qty}</span><button data-idx="${idx}" class="qplus">+</button></div>
+          </div>
+          <div style="text-align:right">
+            <div>${money(line)}</div>
+            <button data-idx="${idx}" class="btn" style="height:32px;margin-top:6px">삭제</button>
+          </div>
+        </div>`;
       });
+      cartItemsEl.innerHTML=html; $('#cartTotal').textContent=money(total);
+    }
+
+    function openCart(){ ov.classList.add('show'); cartDr.classList.add('show'); renderCart(); }
+    function closeCart(){ ov.classList.remove('show'); cartDr.classList.remove('show'); }
+
+    ov.addEventListener('click', closeCart);
+    cartBtn.addEventListener('click', openCart);
+
+    // Cart item events (delegate)
+    cartItemsEl.addEventListener('click', (e)=>{
+      const idx = e.target.dataset.idx;
+      const items=getCart();
+      if(e.target.classList.contains('qminus')){ items[idx].qty=Math.max(1, items[idx].qty-1); setCart(items); }
+      else if(e.target.classList.contains('qplus')){ items[idx].qty=Math.min(99, items[idx].qty+1); setCart(items); }
+      else if(e.target.textContent==='삭제'){ items.splice(idx,1); setCart(items); }
     });
 
-    // 카드 전체 클릭 -> 상세 페이지 새 창
-    document.querySelectorAll('.card').forEach(card => {
+    $('#clearCart').addEventListener('click', ()=>{ setCart([]); });
+    $('#goCheckout').addEventListener('click', ()=>{
+      const items = getCart();
+      if(!items.length) return toast('장바구니가 비었습니다');
+      const payload = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(items)))));
+      location.href = '/checkout.html?cart=' + payload;
+    });
+
+    updateCartBadge();
+
+    // 제품 카드 이벤트
+    $$('.card').forEach(card=>{
+      // 카드 클릭 → 상세 페이지
       card.addEventListener('click', (e)=>{
-        if(e.target.closest('.checkout')) return; // 구매 버튼 클릭은 제외
-        const sku = card.dataset.sku;
-        window.open('/?view=detail&sku=' + encodeURIComponent(sku), '_blank');
+        if(e.target.closest('.buy')) return; // 버튼 클릭은 제외
+        const sku=card.dataset.sku; window.open('/?view=detail&sku='+encodeURIComponent(sku),'_blank');
+      });
+      // 장바구니
+      card.querySelector('.addcart').addEventListener('click', ()=>{
+        const it={
+          sku:card.dataset.sku,
+          name:card.dataset.name,
+          price:+card.dataset.price,
+          color:card.dataset.color||'',
+          img:card.querySelector('img').src
+        };
+        addToCart(it);
+      });
+      // 바로구매
+      card.querySelector('.checkout').addEventListener('click', ()=>{
+        const q = new URLSearchParams({ name:card.dataset.name, price:card.dataset.price, color:card.dataset.color||'', qty:1 });
+        location.href = '/checkout.html?' + q.toString();
       });
     });
 
-    // 뷰 파라미터 처리: shop 전용 보기 / 상세 보기
+    // ===== 리뷰(로컬) =====
+    const REV_KEY='reviews';
+    function getRevs(){ return load(REV_KEY, {}); }
+    function setRevs(o){ save(REV_KEY, o); renderReviews(); }
+    function starStr(n){ return '★★★★★'.slice(0,n) + '☆☆☆☆☆'.slice(0,5-n); }
+
+    function renderReviews(){
+      const map=getRevs();
+      const out=[];
+      Object.entries(map).forEach(([sku, arr])=>{
+        if(!arr.length) return;
+        const avg = (arr.reduce((s,r)=>s+r.star,0)/arr.length).toFixed(1);
+        out.push(`<div class="rv"><div class="stars">${sku} · 평균 ${avg}점</div>${arr.map(r=>`<div class="txt">${starStr(r.star)} — ${r.text.replace(/</g,'&lt;')}</div>`).join('')}</div>`);
+      });
+      $('#reviewList').innerHTML = out.join('') || '<div class="rv"><div class="txt">아직 리뷰가 없습니다.</div></div>';
+    }
+
+    $('#revSubmit').addEventListener('click', ()=>{
+      const sku=$('#revSku').value; const star=+$('#revStar').value; const text=$('#revText').value.trim();
+      if(!text) return toast('리뷰 내용을 입력하세요');
+      const map=getRevs(); map[sku]=map[sku]||[]; map[sku].push({star,text,ts:Date.now()}); setRevs(map); $('#revText').value=''; toast('리뷰가 등록되었습니다');
+    });
+    $('#revClear').addEventListener('click', ()=>{ save(REV_KEY, {}); renderReviews(); });
+    renderReviews();
+
+    // ===== 뷰 파라미터 처리 =====
     (function(){
-      const p = new URLSearchParams(location.search);
-      const view = p.get('view');
-      if(!view) return;
+      const p = new URLSearchParams(location.search); const view = p.get('view'); if(!view) return;
       const main = document.querySelector('main.wrap');
       const hide = sel => { const el=document.querySelector(sel); if(el) el.style.display='none'; };
       const PRODUCTS = {
-        'camp-blue': { name:'Camp Cap — Blue', price:59000, color:'Blue', img:'/img/cap_blue.jpg', desc:'선명한 블루 톤의 캠프캡. 가벼운 원단과 안정적인 5패널 패턴.' },
-        'camp-black': { name:'Camp Cap — Black', price:59000, color:'Black', img:'/img/cap_black.jpg', desc:'가장 인기 있는 블랙 컬러. 어떤 코디에도 매칭 쉬운 데일리 아이템.' }
+        'camp-blue': { name:'Camp Cap — Blue', price:59000, color:'Blue', img:'/img/cap_blue.jpg', desc:'선명한 블루 톤의 캠프캡. 가벼운 원단과 안정적인 5패널 패턴.', stock:7 },
+        'camp-black': { name:'Camp Cap — Black', price:59000, color:'Black', img:'/img/cap_black.jpg', desc:'가장 인기 있는 블랙 컬러. 어떤 코디에도 매칭 쉬운 데일리 아이템.', stock:3 }
       };
+
       if(view==='shop'){
-        document.title='Shop — anomal';
-        hide('.hero'); hide('#about'); hide('#reviews'); hide('#cs');
-        window.scrollTo(0,0);
-        return;
+        document.title='Shop — anomal'; hide('.hero'); hide('#about'); hide('#reviews'); hide('#cs'); window.scrollTo(0,0); return;
       }
+
       if(view==='detail'){
-        document.title='Product — anomal';
-        hide('.hero'); hide('#about'); hide('#reviews'); hide('#cs'); hide('#shop');
-        const sku = p.get('sku');
-        const pd = PRODUCTS[sku];
-        if(!pd){
-          main.innerHTML = '<section class="sec"><h2>상품을 찾을 수 없습니다.</h2><p><a href="/">메인으로</a></p></section>';
-          return;
-        }
+        document.title='Product — anomal'; hide('.hero'); hide('#about'); hide('#reviews'); hide('#cs'); hide('#shop');
+        const sku = p.get('sku'); const pd = PRODUCTS[sku];
+        if(!pd){ main.innerHTML = '<section class="sec"><h2>상품을 찾을 수 없습니다.</h2><p><a href="/">메인으로</a></p></section>'; return; }
         const q = new URLSearchParams({ name: pd.name, price: pd.price, color: pd.color, qty: 1 });
         main.innerHTML = `
           <section class="sec" id="pdp">
             <div style="display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:start">
-              <div style="border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff">
+              <div style="position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff">
+                <span class="stock" style="left:12px;top:12px">재고 ${pd.stock}</span>
                 <img src="${pd.img}" alt="${pd.name}" style="width:100%;height:auto;display:block"/>
               </div>
               <div>
                 <h1 style="margin:0 0 8px">${pd.name}</h1>
-                <div style="font-size:20px;font-weight:700;margin-bottom:12px">₩${pd.price.toLocaleString('ko-KR')}</div>
+                <div style="font-size:20px;font-weight:700;margin-bottom:12px">${money(pd.price)}</div>
                 <div style="color:var(--muted);line-height:1.7;margin-bottom:16px">${pd.desc}</div>
-                <a class="btn" style="background:#111;color:#fff;display:inline-flex" href="/checkout.html?${q.toString()}">구매하기</a>
-                <div style="margin-top:16px;color:#6b7280;font-size:13px">🚚 평일 14시 이전 당일출고 · ↩ 7일 이내 교환/반품</div>
+                <div style="display:flex;gap:8px">
+                  <button id="pdpAdd" class="btn" type="button">장바구니</button>
+                  <a class="btn prime" href="/checkout.html?${q.toString()}">바로구매</a>
+                </div>
+                <div style="margin-top:16px;color:#6b7280;font-size:13px">🚚 지금 주문 시 <span id="etaText2"></span> 도착 예상</div>
               </div>
             </div>
           </section>`;
+        // ETA 2
+        (function(){
+          const now = new Date(); const cutoff = new Date(); cutoff.setHours(14,0,0,0);
+          const ship = new Date(now < cutoff ? now : new Date(now.getTime()+86400000));
+          const arrive = new Date(ship.getTime()+86400000);
+          $('#etaText2').textContent = `${arrive.getMonth()+1}/${arrive.getDate()}(평균)`;
+        })();
+        // PDP 장바구니
+        $('#pdpAdd').addEventListener('click', ()=>{
+          addToCart({ sku, name: pd.name, price: pd.price, color: pd.color, img: pd.img }); openCart();
+        });
       }
     })();
 
-    document.querySelectorAll('img').forEach(img=> img.loading = 'lazy');
-  </script>
-
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"Organization",
-    "name":"anomal",
-    "url":"https://anomal.kr/",
-    "logo":"https://anomal.kr/img/logo.png",
-    "sameAs":["https://www.instagram.com/yourbrand"]
-  }
+    // Lazy
+    $$('img').forEach(img=> img.loading='lazy');
   </script>
 </body>
 </html>
