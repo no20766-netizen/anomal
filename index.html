@@ -139,7 +139,7 @@
     <div class="items" id="bagItems"></div>
     <footer>
       <div class="coupon">
-        <input id="coupon" placeholder="쿠폰 코드 (SAVE10 / WELCOME3 / FREESHIP)" />
+        <input id="coupon" placeholder="쿠폰 코드 입력" />
         <button id="applyCoupon" class="btn" type="button" style="height:40px">적용</button>
         <button id="cancelCoupon" class="btn ghost" type="button" style="height:40px">취소</button>
       </div>
@@ -259,7 +259,7 @@
         $('#sumDiscount').textContent = '-'+money(0).slice(1);
         $('#sumShipping').textContent = money(0);
         $('#sumTotal').textContent = money(0);
-        $('#sumNote').textContent = '7만 원 이상 무료 배송 · 쿠폰은 중복 적용되지 않습니다.';
+        $('#sumNote').textContent = '5만 원 이상 무료 배송 · 쿠폰은 중복 적용되지 않습니다.';
         return;
       }
       let subtotal = 0;
