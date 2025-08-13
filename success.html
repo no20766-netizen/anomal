@@ -22,6 +22,7 @@
     .card{border:1px solid var(--line);border-radius:0;background:#fff;padding:16px}
     table{width:100%;border-collapse:collapse}
     th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
+    .sum{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:6px}
   </style>
 </head>
 <body>
@@ -31,6 +32,7 @@
     <div class="card" style="margin-bottom:16px">
       <div id="orderInfo" style="margin-bottom:10px;font-weight:600"></div>
       <div id="items"></div>
+      <div id="totals"></div>
     </div>
     <div style="display:flex;gap:8px">
       <a class="card" style="padding:10px" href="/">메인으로</a>
@@ -48,7 +50,16 @@
         <td><div style="font-weight:600">${it.name}</div><div style="color:#64748b;font-size:12px">수량 ${it.qty}</div></td>
         <td style="text-align:right">${money(line)}</td>
       </tr>`; }).join('');
-      $('#items').innerHTML=`<table><thead><tr><th></th><th>상품</th><th style="text-align:right">금액</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td colspan="2">합계</td><td style="text-align:right">${money(total)}</td></tr></tfoot></table>`;
+      $('#items').innerHTML=`<table><thead><tr><th></th><th>상품</th><th style="text-align:right">금액</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
+    if(data && data.summary){
+      const s=data.summary;
+      $('#totals').innerHTML = `
+        <div class="sum"><span>소계</span><strong>${money(s.subtotal)}</strong></div>
+        <div class="sum"><span>할인${s.coupon?` (${s.coupon})`:''}</span><strong>-${money(s.discount).slice(1)}</strong></div>
+        <div class="sum"><span>배송비</span><strong>${money(s.shipping)}</strong></div>
+        <div class="sum" style="border-top:1px solid #e5e7eb;padding-top:6px"><span>총 결제금액</span><strong>${money(s.total)}</strong></div>
+      `;
     }
   </script>
 </body>

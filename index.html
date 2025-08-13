@@ -6,7 +6,6 @@
   <title>anomal</title>
   <meta name="description" content="anomal — minimal headwear." />
   <link rel="icon" href="/favicon.ico" />
-  <!-- Hip, simple Korean-friendly font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -20,7 +19,6 @@
     }
     :root{
       --bg:#ffffff; --fg:#0a0a0a; --muted:#6b7280; --line:#e5e7eb;
-      --black:#000; --white:#fff;
       --ship_free_threshold:70000; --ship_fee:3000;
     }
     *{box-sizing:border-box}
@@ -28,13 +26,9 @@
       font-family:"Pretendard Variable","Space Grotesk",Inter,system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,sans-serif}
     a{color:inherit;text-decoration:none}
     img{display:block;max-width:100%}
-    /* Square aesthetic */
-    .square{border-radius:0}
-    /* Header */
-    .hd{position:sticky;top:0;background:var(--white);z-index:70;border-bottom:1px solid var(--line)}
+    .hd{position:sticky;top:0;background:#fff;z-index:70;border-bottom:1px solid var(--line)}
     .hdin{max-width:1280px;margin:0 auto;height:72px;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
     .left{display:flex;align-items:center;gap:28px}
-    .brand{display:flex;align-items:center;gap:12px}
     .brand img{height:28px;width:auto}
     .nav{display:flex;gap:18px}
     .nav a{font-size:13px;letter-spacing:.04em}
@@ -42,22 +36,19 @@
     .bag{position:relative;border:1px solid var(--line);padding:8px 12px;border-radius:0;background:#fff;cursor:pointer}
     .bag .badge{position:absolute;top:-6px;right:-6px;background:#000;color:#fff;border-radius:999px;
       font-size:11px;line-height:1;padding:4px 6px;min-width:18px;text-align:center;display:none}
-    /* Layout blocks */
     .wrap{max-width:1280px;margin:0 auto;padding:0 24px}
-    /* Fullscreen carousel */
     .carousel{height:calc(100vh - 72px);position:relative;overflow:hidden}
     .slides{height:100%;display:flex;transition:transform .45s ease}
     .slide{min-width:100%;height:100%;display:grid;place-items:center;background:#fff}
-    .slide img{width:55vw;max-width:820px;height:auto;object-fit:contain}
-    .ctrl{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:0;border:1px solid #0a0a0a;background:rgba(255,255,255,.9);display:grid;place-items:center;cursor:pointer}
-    .ctrl.prev{left:14px} .ctrl.next{right:14px}
-    /* Shop grid */
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:48px;margin:40px 0 80px}
-    .item .ph{aspect-ratio:3/4;object-fit:cover;background:#f6f6f6;border:1px solid #e5e7eb;border-radius:0}
-    .meta{margin-top:10px;font-size:12px;letter-spacing:.02em}
+    .slide img{width:50vw;max-width:820px;height:auto;object-fit:contain}
+    .dots{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:8px}
+    .dot{width:8px;height:8px;border-radius:999px;border:1px solid #0a0a0a;background:transparent;opacity:.5;cursor:pointer}
+    .dot.active{background:#0a0a0a;opacity:1}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin:40px 0 80px}
+    .item .ph{aspect-ratio:1/1;object-fit:cover;background:#f6f6f6;border:1px solid #e5e7eb;border-radius:0}
+    .meta{margin-top:8px;font-size:12px;letter-spacing:.02em}
     .meta .name{font-weight:600}
     .meta .price{margin-top:2px;color:#111}
-    /* PDP */
     .pdp{display:grid;grid-template-columns:1.2fr .8fr;gap:40px;margin:40px 0 80px}
     .pdp .big{border:1px solid var(--line);border-radius:0}
     .pdp h1{margin:0 0 8px;font-size:20px;font-weight:600}
@@ -66,7 +57,6 @@
     .btn.ghost{background:#fff;color:#111}
     .btn.full{width:100%}
     .stack{display:grid;gap:10px}
-    /* Add-to-bag black panel */
     .mini{position:fixed;top:20px;right:20px;width:340px;background:#000;color:#fff;border:2px solid #000;
       border-radius:0;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.2);opacity:0;transform:translateY(-8px);
       pointer-events:none;transition:opacity .2s, transform .2s;z-index:90}
@@ -78,7 +68,6 @@
     .mini .price{font-size:12px;color:#cfcfcf}
     .mini .btn{height:38px}
     .mini .btn.ghost{background:transparent;border:1px solid #fff;color:#fff}
-    /* Drawer (bag) */
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:80}
     .overlay.show{opacity:1;pointer-events:auto}
     .drawer{position:fixed;top:0;right:-520px;width:520px;height:100vh;background:#fff;border-left:1px solid #e5e7eb;transition:right .3s ease;z-index:85;display:flex;flex-direction:column}
@@ -92,20 +81,13 @@
     .drawer footer{border-top:1px solid #ececec;padding:12px 16px}
     .muted{color:#6b7280;font-size:12px}
     .sum{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:4px}
-    .coupon{display:grid;grid-template-columns:1fr auto;gap:8px;margin:10px 0}
+    .coupon{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin:10px 0}
     .coupon input{height:40px;border:1px solid #e5e7eb;padding:0 10px;border-radius:0}
-    /* Undo toast */
     .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 14px;border-radius:0;border:1px solid #000;opacity:0;pointer-events:none;transition:opacity .2s;z-index:95}
     .toast.show{opacity:1}
-    @media(max-width:960px){
-      .grid{grid-template-columns:repeat(2,1fr);gap:28px}
-      .pdp{grid-template-columns:1fr}
-      .drawer{width:92vw}
-    }
-    @media(max-width:560px){
-      .grid{grid-template-columns:1fr}
-      .slide img{width:86vw}
-    }
+    @media(max-width:1200px){ .grid{grid-template-columns:repeat(3,1fr)} }
+    @media(max-width:900px){ .grid{grid-template-columns:repeat(2,1fr)} .pdp{grid-template-columns:1fr} .drawer{width:92vw} }
+    @media(max-width:560px){ .grid{grid-template-columns:1fr} .slide img{width:84vw} }
   </style>
 </head>
 <body>
@@ -120,7 +102,7 @@
         </nav>
       </div>
       <div class="right">
-        <button id="bagBtn" class="bag square" type="button">BAG <span id="bagCount" class="badge">0</span></button>
+        <button id="bagBtn" class="bag" type="button">BAG <span id="bagCount" class="badge">0</span></button>
       </div>
     </div>
   </header>
@@ -128,17 +110,15 @@
   <main class="wrap" id="main">
     <section class="carousel" id="carousel">
       <div class="slides" id="slides"></div>
-      <button class="ctrl prev square" id="prev" aria-label="previous">‹</button>
-      <button class="ctrl next square" id="next" aria-label="next">›</button>
+      <div class="dots" id="dots"></div>
     </section>
   </main>
 
-  <footer class="ft" style="border-top:1px solid var(--line);padding:28px 0 60px;text-align:center;color:#a3a3a3;font-size:12px">
+  <footer style="border-top:1px solid var(--line);padding:28px 0 60px;text-align:center;color:#a3a3a3;font-size:12px">
     © <span id="yy"></span> anomal
   </footer>
 
-  <!-- Add-to-bag black panel -->
-  <aside id="mini" class="mini square" aria-live="polite">
+  <aside id="mini" class="mini" aria-live="polite">
     <h4>쇼핑백에 추가하기…</h4>
     <div class="row" style="margin-bottom:10px">
       <img id="miniImg" src="" alt="thumbnail"/>
@@ -148,20 +128,20 @@
       </div>
     </div>
     <div class="row" style="gap:8px">
-      <a id="miniBag" class="btn ghost square" href="#">쇼핑백 보기</a>
-      <a id="miniCheckout" class="btn square" href="#">바로 구매</a>
+      <a id="miniBag" class="btn ghost" href="#">쇼핑백 보기</a>
+      <a id="miniCheckout" class="btn" href="#">바로 구매</a>
     </div>
   </aside>
 
-  <!-- Bag Drawer -->
   <div id="ov" class="overlay"></div>
-  <aside id="drawer" class="drawer square" aria-hidden="true">
+  <aside id="drawer" class="drawer" aria-hidden="true">
     <header>쇼핑백</header>
     <div class="items" id="bagItems"></div>
     <footer>
       <div class="coupon">
-        <input id="coupon" placeholder="쿠폰 코드 입력" />
-        <button id="applyCoupon" class="btn square" type="button" style="height:40px">적용</button>
+        <input id="coupon" placeholder="쿠폰 코드 (SAVE10 / WELCOME3 / FREESHIP)" />
+        <button id="applyCoupon" class="btn" type="button" style="height:40px">적용</button>
+        <button id="cancelCoupon" class="btn ghost" type="button" style="height:40px">취소</button>
       </div>
       <div class="sum"><span>소계</span><strong id="sumSubtotal">₩0</strong></div>
       <div class="sum"><span>할인</span><strong id="sumDiscount">-₩0</strong></div>
@@ -169,19 +149,17 @@
       <div class="sum" style="border-top:1px solid #e5e7eb;padding-top:6px"><span>총 결제금액</span><strong id="sumTotal">₩0</strong></div>
       <div class="muted" id="sumNote" style="margin:6px 0 10px">7만 원 이상 무료 배송 · 쿠폰은 중복 적용되지 않습니다.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <button id="keepShop" class="btn ghost square" type="button" style="border-color:#111">계속 쇼핑하기</button>
-        <button id="goCheckout" class="btn square" type="button">주문결제</button>
+        <button id="keepShop" class="btn ghost" type="button" style="border-color:#111">계속 쇼핑하기</button>
+        <button id="goCheckout" class="btn" type="button">주문결제</button>
       </div>
     </footer>
   </aside>
 
-  <!-- Undo toast -->
-  <div id="toast" class="toast square">삭제됨. <button id="undo" class="btn ghost square" style="height:28px;border-color:#fff;color:#fff;margin-left:8px">실행취소</button></div>
+  <div id="toast" class="toast">삭제됨. <button id="undo" class="btn ghost" style="height:28px;border-color:#fff;color:#fff;margin-left:8px">실행취소</button></div>
 
   <script>
     const $ = s => document.querySelector(s);
     const $$ = s => Array.from(document.querySelectorAll(s));
-    const main = $('#main');
     const money = n => '₩' + Number(n||0).toLocaleString('ko-KR');
     const save = (k,v)=> localStorage.setItem(k, JSON.stringify(v));
     const load = (k,def)=> JSON.parse(localStorage.getItem(k) || JSON.stringify(def));
@@ -191,32 +169,30 @@
     const SHIP = Number(getComputedStyle(document.documentElement).getPropertyValue('--ship_fee').trim()) || 3000;
 
     const PRODUCTS = {
-      'camp-blue':  { name:'Camp Cap — Blue',  price:59000, img:'/img/cap_blue.jpg'  },
-      'camp-black': { name:'Camp Cap — Black', price:59000, img:'/img/cap_black.jpg' },
-      'camp-navy':  { name:'Camp Cap — Navy',  price:59000, img:'/img/cap_navy.jpg'  },
-      'camp-khaki': { name:'Camp Cap — Khaki', price:59000, img:'/img/cap_khaki.jpg' },
-      'camp-ivory': { name:'Camp Cap — Ivory', price:59000, img:'/img/cap_ivory.jpg' }
+      'camp-blue':  { name:'Camp Cap — Blue',  price:59000, img:'/img/campcap_blue.jpg'  },
+      'camp-black': { name:'Camp Cap — Black', price:59000, img:'/img/campcap_black.jpg' },
+      'ball-red':   { name:'Ball Cap — Red',   price:59000, img:'/img/ballcap_red.jpg'   },
+      'ball-black': { name:'Ball Cap — Black', price:59000, img:'/img/ballcap_black.jpg' }
     };
-    const HOME_SLIDES = ['/img/cover.jpg','/img/cap_blue.jpg','/img/cap_black.jpg'];
+    const HOME_SLIDES = ['/img/cover1.jpg','/img/cover2.jpg','/img/cover3.jpg'];
 
-    // ===== Header bag badge =====
     const updateBagBadge = () => {
       const n = load(CART_KEY, []).reduce((s,i)=>s+i.qty,0);
       const b = $('#bagCount'); b.textContent = n;
       b.style.display = n ? 'inline-flex' : 'none';
     };
 
-    // ===== Mini panel for add-to-bag =====
     function showMini(pd){
       $('#miniImg').src = pd.img; $('#miniName').textContent = pd.name; $('#miniPrice').textContent = money(pd.price);
       const payload = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify([{ sku:pd.sku, name: pd.name, price: pd.price, qty:1, img: pd.img }])))));
-      $('#miniCheckout').href = '/checkout.html?cart=' + payload;
+      const coupon = load(COUPON_KEY, null);
+      const url = '/checkout.html?cart=' + payload + (coupon?('&coupon='+encodeURIComponent(coupon)):'')
+      $('#miniCheckout').href = url;
       $('#mini').classList.add('show');
       setTimeout(()=> $('#mini').classList.remove('show'), 2500);
     }
     $('#miniBag').addEventListener('click', (e)=>{ e.preventDefault(); openDrawer(); });
 
-    // ===== Cart helpers =====
     function getCart(){ return load(CART_KEY, []); }
     function setCart(items){ save(CART_KEY, items); updateBagBadge(); renderDrawer(); }
     function addToCart(sku, qty=1){
@@ -227,30 +203,40 @@
       setCart(cart); showMini({sku, ...p});
     }
 
-    // ===== Coupon logic =====
-    function getCoupon(){ return (load(COUPON_KEY, null)); }
-    function setCoupon(code){ save(COUPON_KEY, code); renderDrawer(); }
+    const COUPON_RULES = {
+      SAVE10:   { type:'percent', value:10,  min:0,      freeShip:false, expires:'2099-12-31' },
+      WELCOME3: { type:'flat',    value:3000,min:0,      freeShip:false, expires:'2099-12-31' },
+      FREESHIP: { type:'flat',    value:0,   min:0,      freeShip:true,  expires:'2099-12-31' },
+    };
+    function getRule(code){
+      if(!code) return null;
+      const r = COUPON_RULES[code.toUpperCase()];
+      if(!r) return null;
+      if(r.expires && new Date() > new Date(r.expires + 'T23:59:59')) return null;
+      return r;
+    }
     function calcDiscount(subtotal, code){
-      if(!code) return 0;
-      if(code.toUpperCase()==='SAVE10') return Math.floor(subtotal*0.10);
-      if(code.nojihun()==='WELCOME3') return Math.floor(subtotal*0.90);
-      if(code.toUpperCase()==='FREESHIP') return 0; // handled in shipping
+      const r = getRule(code); if(!r) return 0;
+      if(subtotal < (r.min||0)) return 0;
+      if(r.type === 'percent') return Math.floor(subtotal * (r.value/100));
+      if(r.type === 'flat')    return Math.min(subtotal, r.value);
       return 0;
     }
-    function calcShipping(subtotal, code){
-      if(subtotal>=FREE) return 0;
-      if(code && code.toUpperCase()==='FREESHIP') return 0;
+    function calcShipping(subtotalAfterDiscount, code){
+      const r = getRule(code);
+      if(subtotalAfterDiscount >= FREE) return 0;
+      if(r && r.freeShip) return 0;
       return SHIP;
     }
 
-    // ===== Drawer =====
     const ov = $('#ov'); const dr = $('#drawer');
     function openDrawer(){ ov.classList.add('show'); dr.classList.add('show'); renderDrawer(); }
     function closeDrawer(){ ov.classList.remove('show'); dr.classList.remove('show'); }
     $('#bagBtn').addEventListener('click', openDrawer);
     $('#keepShop').addEventListener('click', closeDrawer);
     ov.addEventListener('click', closeDrawer);
-    $('#applyCoupon').addEventListener('click', ()=>{ const c = $('#coupon').value.trim(); setCoupon(c||null); });
+    $('#applyCoupon').addEventListener('click', ()=>{ const c = $('#coupon').value.trim(); if(c){ localStorage.setItem(COUPON_KEY, JSON.stringify(c)); } else { localStorage.removeItem(COUPON_KEY); } renderDrawer(); });
+    $('#cancelCoupon').addEventListener('click', ()=>{ localStorage.removeItem(COUPON_KEY); $('#coupon').value=''; renderDrawer(); });
 
     let lastRemoved = null; let toastTimer = null;
     const toast = $('#toast'); const undoBtn = $('#undo');
@@ -265,7 +251,7 @@
 
     function renderDrawer(){
       const items = getCart(); const el = $('#bagItems');
-      const code = getCoupon();
+      const code = load(COUPON_KEY, null);
       if(code) $('#coupon').value = code;
       if(!items.length){
         el.innerHTML = '<p class="muted">담긴 상품이 없습니다.</p>';
@@ -335,10 +321,11 @@
     $('#goCheckout').addEventListener('click', ()=>{
       const items = getCart(); if(!items.length) return;
       const payload = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(items)))));
-      location.href = '/checkout.html?cart=' + payload;
+      const coupon = load(COUPON_KEY, null);
+      const url = '/checkout.html?cart=' + payload + (coupon?('&coupon='+encodeURIComponent(coupon)):'')
+      location.href = url;
     });
 
-    // ===== ROUTER =====
     function renderShop(){
       const cards = Object.keys(PRODUCTS).map(sku=>{
         const p = PRODUCTS[sku];
@@ -352,21 +339,21 @@
           </div>
         </article>`;
       }).join('');
-      main.innerHTML = `<section class="grid">${cards}</section>`;
+      $('#main').innerHTML = `<section class="grid">${cards}</section>`;
       $$('img').forEach(img=> img.loading='lazy');
     }
 
     function renderPDP(sku){
       const p = PRODUCTS[sku];
-      if(!p){ main.innerHTML = '<div class="wrap" style="padding:40px 0">상품을 찾을 수 없습니다.</div>'; return; }
-      main.innerHTML = `<section class="pdp">
+      if(!p){ $('#main').innerHTML = '<div class="wrap" style="padding:40px 0">상품을 찾을 수 없습니다.</div>'; return; }
+      $('#main').innerHTML = `<section class="pdp">
         <div class="big"><img src="${p.img}" alt="${p.name}" style="width:100%;height:auto"/></div>
         <div>
           <h1>${p.name}</h1>
           <div class="price">${money(p.price)}</div>
           <div class="stack" style="margin:16px 0">
-            <button id="btnAdd" class="btn full square" type="button">쇼핑백에 추가</button>
-            <button id="btnBuy" class="btn full square" type="button">바로 구매</button>
+            <button id="btnAdd" class="btn full" type="button">쇼핑백에 추가</button>
+            <button id="btnBuy" class="btn full" type="button">바로 구매</button>
           </div>
           <div style="font-size:12px;color:#6b7280">7만 원 이상 구매 시 무료 배송</div>
         </div>
@@ -374,33 +361,42 @@
       $('#btnAdd').addEventListener('click', ()=> addToCart(sku, 1));
       $('#btnBuy').addEventListener('click', ()=>{
         const payload = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify([{ sku, name:p.name, price:p.price, qty:1, img:p.img }])))));
-        location.href = '/checkout.html?cart=' + payload;
+        const coupon = load(COUPON_KEY, null);
+        const url = '/checkout.html?cart=' + payload + (coupon?('&coupon='+encodeURIComponent(coupon)):'')
+        location.href = url;
       });
     }
 
     function renderHome(){
-      main.innerHTML = `<section class="carousel" id="carousel">
+      $('#main').innerHTML = `<section class="carousel" id="carousel">
         <div class="slides" id="slides"></div>
-        <button class="ctrl prev square" id="prev" aria-label="previous">‹</button>
-        <button class="ctrl next square" id="next" aria-label="next">›</button>
+        <div class="dots" id="dots"></div>
       </section>`;
       const slides = $('#slides');
-      slides.innerHTML = HOME_SLIDES.map(src=>`<div class="slide"><img src="${src}" alt="slide"/></div>`).join('');
-      let idx = 0, startX=null, deltaX=0;
-      const go = (n)=>{ idx = (n + HOME_SLIDES.length) % HOME_SLIDES.length; slides.style.transform = `translateX(-${idx*100}%)`; };
-      $('#prev').onclick = ()=> go(idx-1);
-      $('#next').onclick = ()=> go(idx+1);
+      slides.innerHTML = HOME_SLIDES.map(src=>`<div class="slide"><img src="${src}" alt="cover"/></div>`).join('');
+      const dots = $('#dots');
+      dots.innerHTML = HOME_SLIDES.map((_,i)=>`<button class="dot" data-i="${i}" aria-label="go to ${i+1}"></button>`).join('');
+      let idx = 0, startX=null, deltaX=0, timer=null;
+      const go = (n)=>{
+        idx = (n + HOME_SLIDES.length) % HOME_SLIDES.length;
+        slides.style.transform = `translateX(-${idx*100}%)`;
+        $$('.dot').forEach((d,i)=> d.classList.toggle('active', i===idx));
+      };
+      const next = ()=> go(idx+1);
+      const start = ()=> timer = setInterval(next, 5000);
+      const stop = ()=> { if(timer) clearInterval(timer); };
+      $$('.dot').forEach(d=> d.addEventListener('click', ()=>{ stop(); go(Number(d.dataset.i)); start(); }));
       const threshold = 40;
-      const touchStart = (x)=>{ startX = x; deltaX=0; };
+      const touchStart = (x)=>{ startX = x; deltaX=0; stop(); };
       const touchMove = (x)=>{ if(startX===null) return; deltaX = x - startX; };
-      const touchEnd = ()=>{ if(Math.abs(deltaX) > threshold){ if(deltaX<0) go(idx+1); else go(idx-1); } startX=null; };
+      const touchEnd = ()=>{ if(Math.abs(deltaX) > threshold){ if(deltaX<0) next(); else go(idx-1); } startX=null; start(); };
       slides.addEventListener('touchstart', e=> touchStart(e.touches[0].clientX), {passive:true});
       slides.addEventListener('touchmove', e=> touchMove(e.touches[0].clientX), {passive:true});
       slides.addEventListener('touchend', touchEnd);
       slides.addEventListener('pointerdown', e=> touchStart(e.clientX));
       slides.addEventListener('pointermove', e=> touchMove(e.clientX));
       slides.addEventListener('pointerup', touchEnd);
-      setInterval(()=> go(idx+1), 5000);
+      go(0); start();
     }
 
     function route(){
@@ -412,7 +408,6 @@
       renderHome();
     }
 
-    // boot
     document.getElementById('yy').textContent = new Date().getFullYear();
     updateBagBadge(); route(); renderDrawer();
     window.addEventListener('popstate', route);

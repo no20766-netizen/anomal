@@ -15,7 +15,7 @@
       font-display:swap;
       src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/woff2/PretendardVariable.woff2') format('woff2-variations');
     }
-    :root{ --bg:#ffffff; --fg:#0f172a; --muted:#6b7280; --line:#e5e7eb }
+    :root{ --bg:#ffffff; --fg:#0f172a; --muted:#6b7280; --line:#e5e7eb; --ship_free_threshold:70000; --ship_fee:3000 }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:"Pretendard Variable","Space Grotesk",Inter,system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,sans-serif}
     a{color:inherit;text-decoration:none}
@@ -27,9 +27,13 @@
     input,select,textarea{height:42px;width:100%;border:1px solid var(--line);border-radius:0;padding:0 12px}
     textarea{height:96px;padding:12px}
     .btn{display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 16px;border-radius:0;border:1px solid #0f172a;background:#0f172a;color:#fff;cursor:pointer}
+    .btn.ghost{background:#fff;color:#0f172a}
     .muted{color:#6b7280;font-size:12px}
     table{width:100%;border-collapse:collapse;font-size:14px}
     th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
+    .sum{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:6px}
+    .coupon{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:10px}
+    .coupon input{height:40px;border:1px solid #e5e7eb;padding:0 10px}
     @media(max-width:900px){ .grid{grid-template-columns:1fr} }
   </style>
 </head>
@@ -54,9 +58,22 @@
         <h3>주문 요약</h3>
         <div class="body">
           <div id="itemsWrap"></div>
+
+          <div class="coupon">
+            <input id="coupon" placeholder="쿠폰 코드 입력" />
+            <button id="applyCoupon" class="btn" type="button" style="height:40px">적용</button>
+            <button id="cancelCoupon" class="btn ghost" type="button" style="height:40px">취소</button>
+          </div>
+
+          <div class="sum"><span>소계</span><strong id="sumSubtotal">₩0</strong></div>
+          <div class="sum"><span>할인</span><strong id="sumDiscount">-₩0</strong></div>
+          <div class="sum"><span>배송비</span><strong id="sumShipping">₩0</strong></div>
+          <div class="sum" style="border-top:1px solid #e5e7eb;padding-top:6px"><span>총 결제금액</span><strong id="sumTotal">₩0</strong></div>
+          <div class="muted" id="sumNote" style="margin-top:6px">7만 원 이상 무료 배송 · 쿠폰은 중복 적용되지 않습니다.</div>
+
           <div style="display:flex;gap:8px;margin-top:12px">
             <button id="payBtn" class="btn" type="button" style="flex:1">결제하기(데모)</button>
-            <a href="/?view=shop" class="btn" style="flex:1;background:#fff;color:#0f172a">상품 더보기</a>
+            <a href="/?view=shop" class="btn ghost" style="flex:1">상품 더보기</a>
           </div>
           <div id="msg" class="muted" style="margin-top:8px"></div>
         </div>
@@ -65,27 +82,67 @@
   </div>
   <script>
     const $=s=>document.querySelector(s); const money=n=>'₩'+Number(n||0).toLocaleString('ko-KR');
+    const load=(k,d)=>JSON.parse(localStorage.getItem(k)||JSON.stringify(d)); const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+    const COUPON_KEY='cartCoupon'; const FREE=70000, SHIP=3000;
+    const COUPON_RULES = {
+      SAVE10:   { type:'percent', value:10,  min:0,      freeShip:false, expires:'2099-12-31' },
+      WELCOME3: { type:'flat',    value:3000,min:0,      freeShip:false, expires:'2099-12-31' },
+      FREESHIP: { type:'flat',    value:0,   min:0,      freeShip:true,  expires:'2099-12-31' },
+    };
+    function getRule(code){ if(!code) return null; const r=COUPON_RULES[code.toUpperCase()]; if(!r) return null; if(r.expires && new Date()>new Date(r.expires+'T23:59:59')) return null; return r; }
+    function calcDiscount(subtotal, code){ const r=getRule(code); if(!r) return 0; if(subtotal<(r.min||0)) return 0; if(r.type==='percent') return Math.floor(subtotal*(r.value/100)); if(r.type==='flat') return Math.min(subtotal,r.value); return 0; }
+    function calcShipping(subtotalAfterDiscount, code){ const r=getRule(code); if(subtotalAfterDiscount>=FREE) return 0; if(r && r.freeShip) return 0; return SHIP; }
+
     function parseCart(){
       const p=new URLSearchParams(location.search);
       if(p.get('cart')){ try{return JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(p.get('cart'))))));}catch(e){return [];} }
-      const name=p.get('name'), price=+p.get('price'), qty=+(p.get('qty')||1); const img=p.get('img')||'/img/cover.jpg';
+      const name=p.get('name'), price=+p.get('price'), qty=+(p.get('qty')||1), img=p.get('img')||'/img/cover1.jpg';
       if(!name||!price) return []; return [{ sku:'single', name, price, qty, img }];
     }
     const items=parseCart();
-    if(!items.length){ $('#itemsWrap').innerHTML='<p class="muted">주문할 상품이 없습니다. <a href="/?view=shop">Shop으로 이동</a></p>'; }
-    else{
-      let total=0; const rows=items.map(it=>{ const line=it.price*it.qty; total+=line; return `
+    const qpCoupon = new URLSearchParams(location.search).get('coupon');
+    const initCoupon = qpCoupon || load(COUPON_KEY, null);
+    if(initCoupon) $('#coupon').value = initCoupon;
+
+    function renderItems(){
+      if(!items.length){ $('#itemsWrap').innerHTML='<p class="muted">주문할 상품이 없습니다. <a href="/?view=shop">Shop으로 이동</a></p>'; return 0; }
+      let subtotal=0; const rows=items.map(it=>{ const line=it.price*it.qty; subtotal+=line; return `
         <tr>
           <td style="width:64px"><img src="${it.img}" alt="${it.name}" style="width:64px;height:64px;object-fit:cover;border:1px solid #e5e7eb"/></td>
           <td><div style="font-weight:600">${it.name}</div><div class="muted">수량 ${it.qty}</div></td>
           <td style="text-align:right">${money(line)}</td>
         </tr>`; }).join('');
-      $('#itemsWrap').innerHTML=`<table><tbody>${rows}</tbody><tfoot><tr><td colspan="2">합계</td><td style="text-align:right">${money(total)}</td></tr></tfoot></table>`;
+      $('#itemsWrap').innerHTML=`<table><tbody>${rows}</tbody></table>`;
+      return subtotal;
     }
+
+    function renderTotals(){
+      const code=$('#coupon').value.trim()||null;
+      const subtotal = items.reduce((s,it)=>s+it.price*it.qty,0);
+      const discount = calcDiscount(subtotal, code);
+      const shipping = calcShipping(subtotal - discount, code);
+      const total = Math.max(0, subtotal - discount) + shipping;
+      $('#sumSubtotal').textContent = money(subtotal);
+      $('#sumDiscount').textContent = '-' + money(discount).slice(1);
+      $('#sumShipping').textContent = money(shipping);
+      $('#sumTotal').textContent = money(total);
+      $('#sumNote').textContent = (shipping===0 ? '무료 배송 적용됨 · ' : '') + '쿠폰은 중복 적용되지 않습니다.';
+    }
+
+    renderItems(); renderTotals();
+
+    $('#applyCoupon').addEventListener('click', ()=>{ const code=$('#coupon').value.trim(); if(code) save(COUPON_KEY, code); renderTotals(); });
+    $('#cancelCoupon').addEventListener('click', ()=>{ localStorage.removeItem(COUPON_KEY); $('#coupon').value=''; renderTotals(); });
+
     $('#payBtn').addEventListener('click',()=>{
       if(!items.length) return;
+      const code=$('#coupon').value.trim()||null;
+      const subtotal = items.reduce((s,it)=>s+it.price*it.qty,0);
+      const discount = calcDiscount(subtotal, code);
+      const shipping = calcShipping(subtotal - discount, code);
+      const total = Math.max(0, subtotal - discount) + shipping;
       const orderId='ORD-'+Date.now().toString(36).toUpperCase();
-      const payload=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify({orderId,items})))));
+      const payload=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify({orderId,items,summary:{subtotal,discount,shipping,total, coupon:code}})))));
       location.href='/success.html?o='+orderId+'&p='+payload;
     });
   </script>
