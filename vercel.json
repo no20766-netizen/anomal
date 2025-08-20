@@ -1,0 +1,13 @@
+{
+  "routes": [
+    { "src": "^/admin/login(?:\\.html)?$", "dest": "/admin/login.html" },
+
+    { "src": "^/admin/assets/(.*)$", "dest": "/admin/assets/$1" },
+
+    { "src": "^/admin(?:/(.*))?$", "dest": "/api/_guard?path=$1" },
+
+    { "src": "^/__public/admin/(.*)$", "dest": "/admin/$1" },
+
+    { "src": "^/pay/return$", "dest": "/api/nicepay/return" }
+  ]
+}

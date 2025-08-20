@@ -1,0 +1,1 @@
+Put your cover.jpg, cap_black.jpg, cap_navy.jpg, cap_khaki.jpg here.

@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>anomal</title>
+  <meta name="description" content="anomal — minimal headwear." />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    @font-face{
+      font-family:'Pretendard Variable';
+      font-weight:45 920;
+      font-style:normal;
+      font-display:swap;
+      src:url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/woff2/PretendardVariable.woff2') format('woff2-variations');
+    }
+    :root{ --bg:#ffffff; --fg:#0a0a0a; --muted:#6b7280; --line:#e5e7eb; --ship_free_threshold:50000; --ship_fee:4000; }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);
+      font-family:"Pretendard Variable","Space Grotesk",Inter,system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,sans-serif}
+    a{color:inherit;text-decoration:none}
+    img{display:block;max-width:100%}
+
+    /* header */
+    .hd{position:sticky;top:0;background:#fff;z-index:70;border-bottom:1px solid var(--line)}
+    .hdin{max-width:1280px;margin:0 auto;height:72px;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+    .left{display:flex;align-items:center;gap:28px}
+    .brand img{height:28px;width:auto}
+    .nav{display:flex;gap:18px}
+    .nav a{font-size:13px;letter-spacing:.04em}
+    .right{display:flex;align-items:center;gap:12px}
+
+    /* bag button + badge */
+    .bag{position:relative;border:1px solid var(--line);padding:8px 12px;border-radius:0;background:#fff;cursor:pointer}
+    .bag .badge{position:absolute;top:-6px;right:-6px;background:#000;color:#fff;border-radius:999px;
+      font-size:11px;line-height:1;padding:4px 6px;min-width:18px;text-align:center;display:none}
+
+    /* auth buttons */
+    .authbtn{padding:8px 12px;border:1px solid #111;border-radius:0;font-size:13px;letter-spacing:.02em;text-decoration:none}
+    .authbtn.ghost{background:#fff;color:#111}
+    .authbtn.solid{background:#111;color:#fff;border-color:#111}
+
+    /* layout & components (원래 그대로) */
+    .wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+    .carousel{height:calc(100vh - 72px);position:relative;overflow:hidden}
+    .slides{height:100%;display:flex;transition:transform .45s ease}
+    .slide{min-width:100%;height:100%;display:grid;place-items:center;background:#fff}
+    .slide img{width:50vw;max-width:820px;height:auto;object-fit:contain}
+    .dots{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:8px}
+    .dot{width:8px;height:8px;border-radius:999px;border:1px solid #0a0a0a;background:transparent;opacity:.5;cursor:pointer}
+    .dot.active{background:#0a0a0a;opacity:1}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin:40px 0 80px}
+    .item .ph{aspect-ratio:1/1;object-fit:cover;background:#f6f6f6;border:1px solid #e5e7eb;border-radius:0}
+    .meta{margin-top:8px;font-size:12px;letter-spacing:.02em}
+    .meta .name{font-weight:600}
+    .meta .price{margin-top:2px;color:#111}
+    .pdp{display:grid;grid-template-columns:1.2fr .8fr;gap:40px;margin:40px 0 80px}
+    .pdp .big{border:1px solid var(--line)}
+    .pdp h1{margin:0 0 8px;font-size:20px;font-weight:600}
+    .pdp .price{font-weight:700;margin-bottom:14px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 16px;border-radius:0;border:1px solid #111;background:#111;color:#fff;cursor:pointer}
+    .btn.ghost{background:#fff;color:#111}
+    .btn.full{width:100%}
+    .stack{display:grid;gap:10px}
+    .mini{position:fixed;top:20px;right:20px;width:340px;background:#000;color:#fff;border:2px solid #000;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.2);opacity:0;transform:translateY(-8px);
+      pointer-events:none;transition:opacity .2s,transform .2s;z-index:90}
+    .mini.show{opacity:1;transform:translateY(0);pointer-events:auto}
+    .mini h4{margin:0 0 6px;font-size:14px;letter-spacing:.03em}
+    .mini .row{display:flex;align-items:center;gap:10px}
+    .mini img{width:54px;height:54px;object-fit:cover;border:1px solid #333}
+    .mini .name{font-size:13px}.mini .price{font-size:12px;color:#cfcfcf}
+    .mini .btn{height:38px}
+    .mini .btn.ghost{background:transparent;border:1px solid #fff;color:#fff}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:80}
+    .overlay.show{opacity:1;pointer-events:auto}
+    .drawer{position:fixed;top:0;right:-520px;width:520px;height:100vh;background:#fff;border-left:1px solid #e5e7eb;transition:right .3s ease;z-index:85;display:flex;flex-direction:column}
+    .drawer.show{right:0}
+    .drawer header{padding:18px 16px;border-bottom:1px solid #ececec;font-weight:600}
+    .drawer .items{flex:1;overflow:auto;padding:16px}
+    .drawer .row{display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;margin-bottom:12px}
+    .qty{display:inline-flex;border:1px solid #e5e7eb;border-radius:0;overflow:hidden}
+    .qty button{width:28px;height:28px;border:0;background:#fff;cursor:pointer}
+    .qty span{display:inline-flex;align-items:center;justify-content:center;width:34px}
+    .drawer footer{border-top:1px solid #ececec;padding:12px 16px}
+    .muted{color:#6b7280;font-size:12px}
+    .sum{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:4px}
+    .coupon{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin:10px 0}
+    .coupon input{height:40px;border:1px solid #e5e7eb;padding:0 10px}
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 14px;border:1px solid #000;opacity:0;pointer-events:none;transition:opacity .2s;z-index:95}
+    .toast.show{opacity:1}
+    @media(max-width:1200px){ .grid{grid-template-columns:repeat(3,1fr)} }
+    @media(max-width:900px){ .grid{grid-template-columns:repeat(2,1fr)} .pdp{grid-template-columns:1fr} .drawer{width:92vw} }
+    @media(max-width:560px){ .grid{grid-template-columns:1fr} .slide img{width:84vw} }
+  </style>
+</head>
+<body>
+  <header class="hd">
+    <div class="hdin">
+      <!-- 왼쪽: 로고 + SHOP -->
+      <div class="left">
+        <a href="/" class="brand" aria-label="home">
+          <img src="/img/logo-black.jpg" alt="anomal logo" />
+        </a>
+        <nav class="nav">
+          <a href="/?view=shop">SHOP</a>
+        </nav>
+      </div>
+
+      <!-- 오른쪽: BAG + 로그인/회원/마이/로그아웃 (한 줄 나란히) -->
+      <div class="right">
+        <button id="bagBtn" class="bag" type="button">장바구니 <span id="bagCount" class="badge">0</span></button>
+        <a id="btnLogin" href="/login.html" class="authbtn ghost" style="display:none;">로그인 / 회원가입</a>
+        <a id="btnMy" href="/account.html" class="authbtn solid" style="display:none;">마이페이지</a>
+        <button id="btnLogout" type="button" class="authbtn ghost" style="display:none;">로그아웃</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap" id="main">
+    <section class="carousel" id="carousel">
+      <div class="slides" id="slides"></div>
+      <div class="dots" id="dots"></div>
+    </section>
+  </main>
+
+  <footer style="border-top:1px solid var(--line);padding:28px 0 60px;text-align:center;color:#a3a3a3;font-size:12px">
+    © <span id="yy"></span> anomal
+  </footer>
+
+  <!-- 미니카트 -->
+  <aside id="mini" class="mini" aria-live="polite">
+    <h4>쇼핑백에 추가하기…</h4>
+    <div class="row" style="margin-bottom:10px">
+      <img id="miniImg" src="" alt="thumbnail"/>
+      <div>
+        <div id="miniName" class="name"></div>
+        <div id="miniPrice" class="price"></div>
+      </div>
+    </div>
+    <div class="row" style="gap:8px">
+      <a id="miniBag" class="btn ghost" href="#">쇼핑백 보기</a>
+      <a id="miniCheckout" class="btn" href="#">바로 구매</a>
+    </div>
+  </aside>
+
+  <!-- 장바구니 drawer -->
+  <div id="ov" class="overlay"></div>
+  <aside id="drawer" class="drawer" aria-hidden="true">
+    <header>쇼핑백</header>
+    <div class="items" id="bagItems"></div>
+    <footer>
+      <div class="coupon">
+        <input id="coupon" placeholder="쿠폰 코드 입력" />
+        <button id="applyCoupon" class="btn" type="button" style="height:40px">적용</button>
+        <button id="cancelCoupon" class="btn ghost" type="button" style="height:40px">취소</button>
+      </div>
+      <div class="sum"><span>소계</span><strong id="sumSubtotal">₩0</strong></div>
+      <div class="sum"><span>할인</span><strong id="sumDiscount">-₩0</strong></div>
+      <div class="sum"><span>배송비</span><strong id="sumShipping">₩0</strong></div>
+      <div class="sum" style="border-top:1px solid #e5e7eb;padding-top:6px"><span>총 결제금액</span><strong id="sumTotal">₩0</strong></div>
+      <div class="muted" id="sumNote" style="margin:6px 0 10px">7만 원 이상 무료 배송 · 쿠폰은 중복 적용되지 않습니다.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button id="keepShop" class="btn ghost" type="button" style="border-color:#111">계속 쇼핑하기</button>
+        <button id="goCheckout" class="btn" type="button">주문결제</button>
+      </div>
+    </footer>
+  </aside>
+
+  <div id="toast" class="toast">삭제됨. <button id="undo" class="btn ghost" style="height:28px;border-color:#fff;color:#fff;margin-left:8px">실행취소</button></div>
+
+  <script>
+    const $ = s => document.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
+    const money = n => '₩' + Number(n||0).toLocaleString('ko-KR');
+    const save = (k,v)=> localStorage.setItem(k, JSON.stringify(v));
+    const load = (k,def)=> JSON.parse(localStorage.getItem(k) || JSON.stringify(def));
+    const CART_KEY = 'cartItems';
+    const COUPON_KEY = 'cartCoupon';
+    const FREE = Number(getComputedStyle(document.documentElement).getPropertyValue('--ship_free_threshold').trim()) || 70000;
+    const SHIP = Number(getComputedStyle(document.documentElement).getPropertyValue('--ship_fee').trim()) || 3000;
+
+    const PRODUCTS = {
+      'camp-blue':  { name:'Camp Cap — Blue',  price:59000, img:'/img/campcap_blue.jpg'  },
+      'camp-black': { name:'Camp Cap — Black', price:59000, img:'/img/campcap_black.jpg' },
+      'ball-red':   { name:'Ball Cap — Red',   price:49000, img:'/img/ballcap_red.jpg'   },
+      'ball-black': { name:'Ball Cap — Black', price:49000, img:'/img/ballcap_black.jpg' }
+    };
+    const HOME_SLIDES = ['/img/cover1.jpg','/img/cover2.jpg','/img/cover3.jpg'];
+
+    const updateBagBadge = () => {
+      const n = load(CART_KEY, []).reduce((s,i)=>s+i.qty,0);
+      const b = $('#bagCount'); b.textContent = n;
+      b.style.display = n ? 'inline-flex' : 'none';
+    };
+
+    function showMini(pd){
+      $('#miniImg').src = pd.img; $('#miniName').textContent = pd.name; $('#miniPrice').textContent = money(pd.price);
+      const payload = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify([{ sku:pd.sku, name: pd.name, price: pd.price, qty:1, img: pd.img }])))));
+      const coupon = load(COUPON_KEY, null);
+      const url = '/checkout.html?cart=' + payload + (coupon?('&coupon='+encodeURIComponent(coupon)):'')
+      $('#miniCheckout').href = url;
+      $('#mini').classList.add('show');
+      setTimeout(()=> $('#mini').classList.remove('show'), 2500);
+    }
+    $('#miniBag').addEventListener('click', (e)=>{ e.preventDefault(); openDrawer(); });
+
+    function getCart(){ return load(CART_KEY, []); }
+    function setCart(items){ save(CART_KEY, items); updateBagBadge(); renderDrawer(); }
+    function addToCart(sku, qty=1){
+      const p = { sku, ...PRODUCTS[sku] };
+      const cart = getCart(); const idx = cart.findIndex(i=> i.sku===sku);
+      if(idx>-1) cart[idx].qty = Math.min(99, cart[idx].qty + qty);
+      else cart.push({ sku, name:p.name, price:p.price, qty, img:p.img });
+      setCart(cart); showMini({sku, ...p});
+    }
+
+    const COUPON_RULES = {
+      ANOMAL2025:{type:'percent',value:10,min:0,freeShip:false,expires:'2099-12-31'},
+      FREESHIP:{type:'flat',value:0,min:0,freeShip:true,expires:'2099-12-31'},
+    };
+    const getRule = code => {
+      if(!code) return null;
+      const r = COUPON_RULES[code.toUpperCase()];
+      if(!r) return null;
+      if(r.expires && new Date() > new Date(r.expires + 'T23:59:59')) return null;
+      return r;
+    };
+    const calcDiscount = (subtotal, code)=>{
+      const r = getRule(code); if(!r) return 0;
+      if(subtotal < (r.min||0)) return 0;
+      return r.type==='percent' ? Math.floor(subtotal*(r.value/100))
+           : r.type==='flat'    ? Math.min(subtotal,r.value) : 0;
+    };
+    const calcShipping = (subtotalAfterDiscount, code)=>{
+      const r = getRule(code);
+      if(subtotalAfterDiscount >= FREE) return 0;
+      if(r && r.freeShip) return 0;
+      return SHIP;
+    };
+
+    const ov = $('#ov'); const dr = $('#drawer');
+    const openDrawer = ()=>{ ov.classList.add('show'); dr.classList.add('show'); renderDrawer(); };
+    const closeDrawer = ()=>{ ov.classList.remove('show'); dr.classList.remove('show'); };
+    $('#bagBtn').addEventListener('click', openDrawer);
+    $('#keepShop').addEventListener('click', closeDrawer);
+    ov.addEventListener('click', closeDrawer);
+    $('#applyCoupon').addEventListener('click', ()=>{
+      const c = $('#coupon').value.trim();
+      if(c){ localStorage.setItem(COUPON_KEY, JSON.stringify(c)); }
+      else{ localStorage.removeItem(COUPON_KEY); }
+      renderDrawer();
+    });
+    $('#cancelCoupon').addEventListener('click', ()=>{ localStorage.removeItem(COUPON_KEY); $('#coupon').value=''; renderDrawer(); });
+
+    let lastRemoved = null; let toastTimer = null;
+    const toast = $('#toast'); const undoBtn = $('#undo');
+    const showToast = ()=>{ clearTimeout(toastTimer); toast.classList.add('show'); toastTimer=setTimeout(()=>toast.classList.remove('show'),4000); };
+    undoBtn.addEventListener('click', ()=>{
+      if(!lastRemoved) return;
+      const cart = getCart();
+      cart.splice(lastRemoved.index, 0, lastRemoved.item);
+      lastRemoved = null; setCart(cart);
+      toast.classList.remove('show');
+    });
+
+    function renderDrawer(){
+      const items = getCart(); const el = $('#bagItems');
+      const code = load(COUPON_KEY, null);
+      if(code) $('#coupon').value = code;
+      if(!items.length){
+        el.innerHTML = '<p class="muted">담긴 상품이 없습니다.</p>';
+        $('#sumSubtotal').textContent = money(0);
+        $('#sumDiscount').textContent = '-' + money(0).slice(1);
+        $('#sumShipping').textContent = money(0);
+        $('#sumTotal').textContent = money(0);
+        $('#sumNote').textContent = '5만 원 이상 무료 배송 · 쿠폰은 중복 적용되지 않습니다.';
+        return;
+      }
+      let subtotal = 0;
+      el.innerHTML = items.map((it,idx)=>{
+        const line = it.price * it.qty; subtotal += line;
+        return `<div class="row">
+          <img src="${it.img}" alt="${it.name}" style="width:72px;height:72px;object-fit:cover;border:1px solid #e5e7eb"/>
+          <div>
+            <div style="font-weight:600">${it.name}</div>
+            <div class="muted" style="margin:4px 0">수량 
+              <span class="qty">
+                <button data-idx="${idx}" class="qminus">-</button>
+                <span>${it.qty}</span>
+                <button data-idx="${idx}" class="qplus">+</button>
+              </span>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div>${money(line)}</div>
+            <button data-idx="${idx}" class="remove" style="margin-top:6px;border:0;background:#fff;cursor:pointer;color:#ef4444">삭제</button>
+          </div>
+        </div>`;
+      }).join('');
+      const discount = calcDiscount(subtotal, code);
+      const shipping = calcShipping(subtotal - discount, code);
+      const total = Math.max(0, subtotal - discount) + shipping;
+      $('#sumSubtotal').textContent = money(subtotal);
+      $('#sumDiscount').textContent = '-' + money(discount).slice(1);
+      $('#sumShipping').textContent = money(shipping);
+      $('#sumTotal').textContent = money(total);
+      $('#sumNote').textContent = (shipping===0 ? '무료 배송 적용됨 · ' : '') + '쿠폰은 중복 적용되지 않습니다.';
+    }
+
+    $('#bagItems').addEventListener('click', (e)=>{
+      const idxRaw = e.target.dataset.idx;
+      if(idxRaw===undefined) return;
+      const idx = Number(idxRaw);
+      const items = getCart();
+      if(e.target.classList.contains('qminus')){
+        items[idx].qty -= 1;
+        if(items[idx].qty<=0){
+          lastRemoved = { index: idx, item: items[idx] };
+          items.splice(idx,1);
+          setCart(items); showToast(); return;
+        }
+        setCart(items);
+      }
+      if(e.target.classList.contains('qplus')){ items[idx].qty = Math.min(99, items[idx].qty+1); setCart(items); }
+      if(e.target.classList.contains('remove')){
+        lastRemoved = { index: idx, item: items[idx] };
+        items.splice(idx,1); setCart(items); showToast();
+      }
+    });
+
+    $('#goCheckout').addEventListener('click', ()=>{
+      const items = getCart(); if(!items.length) return;
+      const payload = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(items)))));
+      const coupon = load(COUPON_KEY, null);
+      const url = '/checkout.html?cart=' + payload + (coupon?('&coupon='+encodeURIComponent(coupon)):'');
+      location.href = url;
+    });
+
+    function renderShop(){
+      const cards = Object.keys(PRODUCTS).map(sku=>{
+        const p = PRODUCTS[sku];
+        return `<article class="item">
+          <a href="/?view=detail&sku=${encodeURIComponent(sku)}">
+            <img class="ph" src="${p.img}" alt="${p.name}"/>
+          </a>
+          <div class="meta">
+            <div class="name">${p.name}</div>
+            <div class="price">${money(p.price)}</div>
+          </div>
+        </article>`;
+      }).join('');
+      $('#main').innerHTML = `<section class="grid">${cards}</section>`;
+      $$('img').forEach(img=> img.loading='lazy');
+    }
+
+    function renderPDP(sku){
+      const p = PRODUCTS[sku];
+      if(!p){ $('#main').innerHTML = '<div class="wrap" style="padding:40px 0">상품을 찾을 수 없습니다.</div>'; return; }
+      $('#main').innerHTML = `<section class="pdp">
+        <div class="big"><img src="${p.img}" alt="${p.name}" style="width:100%;height:auto"/></div>
+        <div>
+          <h1>${p.name}</h1>
+          <div class="price">${money(p.price)}</div>
+          <div class="stack" style="margin:16px 0">
+            <button id="btnAdd" class="btn full" type="button">쇼핑백에 추가</button>
+            <button id="btnBuy" class="btn full" type="button">바로 구매</button>
+          </div>
+          <div style="font-size:12px;color:#6b7280">7만 원 이상 구매 시 무료 배송</div>
+        </div>
+      </section>`;
+      $('#btnAdd').addEventListener('click', ()=> addToCart(sku, 1));
+      $('#btnBuy').addEventListener('click', ()=>{
+        const payload = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify([{ sku, name:p.name, price:p.price, qty:1, img:p.img }])))));
+        const coupon = load(COUPON_KEY, null);
+        const url = '/checkout.html?cart=' + payload + (coupon?('&coupon='+encodeURIComponent(coupon)):'');
+        location.href = url;
+      });
+    }
+
+    function renderHome(){
+      $('#main').innerHTML = `<section class="carousel" id="carousel">
+        <div class="slides" id="slides"></div>
+        <div class="dots" id="dots"></div>
+      </section>`;
+      const slides = $('#slides');
+      slides.innerHTML = ['/img/cover1.jpg','/img/cover2.jpg','/img/cover3.jpg'].map(src=>`<div class="slide"><img src="${src}" alt="cover"/></div>`).join('');
+      const dots = $('#dots');
+      dots.innerHTML = ['/img/cover1.jpg','/img/cover2.jpg','/img/cover3.jpg'].map((_,i)=>`<button class="dot" data-i="${i}" aria-label="go to ${i+1}"></button>`).join('');
+      let idx = 0, startX=null, deltaX=0, timer=null;
+      const go = (n)=>{ idx = (n + 3) % 3; $('#slides').style.transform = `translateX(-${idx*100}%)`; $$('.dot').forEach((d,i)=> d.classList.toggle('active', i===idx)); };
+      const next = ()=> go(idx+1);
+      const start = ()=> timer = setInterval(next, 5000);
+      const stop = ()=> { if(timer) clearInterval(timer); };
+      $$('.dot').forEach(d=> d.addEventListener('click', ()=>{ stop(); go(Number(d.dataset.i)); start(); }));
+      const threshold = 40;
+      const touchStart = (x)=>{ startX = x; deltaX=0; stop(); };
+      const touchMove = (x)=>{ if(startX===null) return; deltaX = x - startX; };
+      const touchEnd = ()=>{ if(Math.abs(deltaX) > threshold){ if(deltaX<0) next(); else go(idx-1); } startX=null; start(); };
+      slides.addEventListener('touchstart', e=> touchStart(e.touches[0].clientX), {passive:true});
+      slides.addEventListener('touchmove', e=> touchMove(e.touches[0].clientX), {passive:true});
+      slides.addEventListener('touchend', touchEnd);
+      slides.addEventListener('pointerdown', e=> touchStart(e.clientX));
+      slides.addEventListener('pointermove', e=> touchMove(e.clientX));
+      slides.addEventListener('pointerup', touchEnd);
+      go(0); start();
+    }
+
+    function route(){
+      const q = new URLSearchParams(location.search);
+      const view = q.get('view');
+      if(!view){ renderHome(); return; }
+      if(view==='shop'){ renderShop(); return; }
+      if(view==='detail'){ renderPDP(q.get('sku')); return; }
+      renderHome();
+    }
+
+    document.getElementById('yy').textContent = new Date().getFullYear();
+    updateBagBadge(); route(); renderDrawer();
+    window.addEventListener('popstate', route);
+  </script>
+
+  <!-- 로그인 상태 토글(Supabase) -->
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+    try {
+      const cfg = await (await fetch('/api/public-supabase')).json();
+      if (cfg?.url && cfg?.anonKey) {
+        const supa = createClient(cfg.url, cfg.anonKey);
+        const { data: { session } } = await supa.auth.getSession();
+        const loggedIn = !!session;
+        const btnLogin = document.getElementById('btnLogin');
+        const btnMy = document.getElementById('btnMy');
+        const btnLogout = document.getElementById('btnLogout');
+        if (btnLogin) btnLogin.style.display = loggedIn ? 'none' : 'inline-block';
+        if (btnMy) btnMy.style.display = loggedIn ? 'inline-block' : 'none';
+        if (btnLogout) btnLogout.style.display = loggedIn ? 'inline-block' : 'none';
+        if (btnLogout) btnLogout.addEventListener('click', async ()=>{ await supa.auth.signOut(); location.reload(); });
+      }
+    } catch(e) {}
+  </script>
+</body>
+</html>

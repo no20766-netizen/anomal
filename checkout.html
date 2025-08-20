@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>결제하기</title>
+  <style>
+    .page { max-width: 960px; margin: 24px auto; padding: 0 16px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    .title { font-size: 28px; font-weight: 800; }
+    .home { text-decoration:none; border:1px solid #e5e7eb; padding:8px 12px; border-radius:10px; color:#111827; }
+    .card { background:#fff; border:1px solid #e5e7eb; border-radius:16px; padding:20px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+    .row { display:flex; gap:24px; align-items:flex-start; }
+    .label { width:72px; color:#6b7280; font-size:13px; padding-top:2px; }
+    .value { font-weight:600; }
+    .muted { color:#6b7280; font-size:13px; }
+    .actions { margin-top:14px; }
+    .btn { display:inline-block; padding:10px 14px; border-radius:10px; text-decoration:none; }
+    .btn-outline { border:1px solid #111827; color:#111827; }
+    .btn-primary { background:#111827; color:#fff; }
+    .grid { display:grid; grid-template-columns: 1fr 360px; gap:16px; margin-top:16px; }
+    @media (max-width: 900px){ .grid{ grid-template-columns: 1fr; } }
+    .sum-row { display:flex; justify-content:space-between; margin:6px 0; }
+    .sum-row.total { font-weight:800; font-size:18px; }
+  </style>
+
+  <!-- 🔗 NICEPAY 최신 JS (네가 쓰던 스크립트 경로 그대로면 그걸로 바꿔도 OK) -->
+  <script src="https://pay.nicepay.co.kr/v1/js/"></script>
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div class="title">결제하기</div>
+      <a class="home" href="/">← 홈으로</a>
+    </div>
+
+    <div class="grid">
+      <!-- 좌측: 배송 정보 / 장바구니 -->
+      <div class="col-left">
+        <div id="shipping-box" class="card">로딩중…</div>
+
+        <div id="cart-box" class="card" style="margin-top:12px">
+          <div class="muted" style="margin-bottom:8px">주문 상품</div>
+          <div id="cart-items">장바구니를 불러오는 중…</div>
+        </div>
+      </div>
+
+      <!-- 우측: 결제 요약 -->
+      <div class="col-right">
+        <div class="card">
+          <div class="muted" style="margin-bottom:8px">결제 금액</div>
+          <div class="sum-row"><div>상품 합계</div><div id="sum-products">-</div></div>
+          <div class="sum-row"><div>배송비</div><div id="sum-shipping">-</div></div>
+          <div class="sum-row total"><div>총 결제</div><div id="sum-total">-</div></div>
+          <div class="actions" style="margin-top:14px">
+            <button id="payBtn" class="btn btn-primary" style="width:100%">결제하기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    // ---------- Supabase ----------
+    async function getSupabaseClient() {
+      const r = await fetch('/api/public-supabase', { cache: 'no-store' });
+      const j = await r.json();
+      if (!j?.url || !j?.anonKey) throw new Error('missing supabase public config');
+      return createClient(j.url, j.anonKey);
+    }
+
+    
+    // ---------- NICEPAY 공개 설정 로드 ----------
+    let __NP_PUBLIC = null;
+    async function getNicepayPublic() {
+      if (__NP_PUBLIC) return __NP_PUBLIC;
+      
+      // 1) NICEPAY 모듈 직접 호출 (여러 함수명 호환)
+      try {
+        const conf = await getNicepayPublic();
+        payload.clientId = conf.clientKey;
+        payload.returnUrl = conf.returnUrl || (location.origin + '/pay/return');
+
+        if (window.NICEPAY && typeof window.NICEPAY.requestPayment === 'function') {
+          window.NICEPAY.requestPayment(payload);
+          return;
+        }
+        if (window.NICEPAY && typeof window.NICEPAY.requestPay === 'function') {
+          window.NICEPAY.requestPay(payload);
+          return;
+        }
+        if (window.NICEPAY && typeof window.NICEPAY.open === 'function') {
+          window.NICEPAY.open(payload);
+          return;
+        }
+        if (typeof window.requestPay === 'function') {
+          window.requestPay(payload);
+          return;
+        }
+      } catch (e) {
+        console.error('[checkout] NICEPAY call failed:', e);
+      }
+
+
+      // 둘 다 없으면 모듈 로드 이슈
+      alert('결제 모듈이 로드되지 않았습니다. (NICEPAY 스크립트 또는 백엔드 라우트 확인)');
+    }
+
+    // ---------- 초기화 ----------
+    async function initCheckout() {
+      try {
+        const supabase = await getSupabaseClient();
+
+        // 로그인 확인
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          location.href = '/login.html?next=' + encodeURIComponent('/checkout.html' + location.search);
+          return;
+        }
+
+        // 프로필(배송지) 가져오기
+        const { data: profiles, error } = await supabase
+          .from('profiles')
+          .select('name, phone, addr1, addr2, zipcode')
+          .eq('auth_user_id', user.id)
+          .limit(1);
+
+        if (error) {
+          console.error('[checkout] profiles error:', error);
+          alert('회원 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+          return;
+        }
+
+        const p = (profiles && profiles[0]) || {};
+        const missing = !p.name || !p.phone || !p.addr1 || !p.zipcode;
+        if (missing) {
+          location.href = '/account.html?next=' + encodeURIComponent('/checkout.html' + location.search);
+          return;
+        }
+
+        // 배송지 요약
+        const el = document.querySelector('#shipping-box');
+        el.innerHTML = `
+          <div class="row">
+            <div class="label">수령인</div><div class="value">${p.name}</div>
+          </div>
+          <div class="row">
+            <div class="label">연락처</div><div class="value">${p.phone}</div>
+          </div>
+          <div class="row">
+            <div class="label">주소</div>
+            <div class="value">${p.addr1} ${p.addr2 ? p.addr2 : ''} (${p.zipcode})</div>
+          </div>
+          <div class="actions">
+            <a class="btn btn-outline" href="/account.html?next=${encodeURIComponent('/checkout.html' + location.search)}">배송지 변경</a>
+          </div>
+        `;
+
+        // 장바구니 렌더링
+        const items = loadCart();
+        const sums = renderCart(items);
+        const total = sums ? sums.total : 0;
+
+        // 결제 버튼
+        document.getElementById('payBtn').onclick = () => {
+          if (!items.length) { alert('장바구니가 비어있습니다.'); return; }
+          startPayment({
+            items,
+            total,
+            buyer: { name: p.name, phone: p.phone, email: user.email || '' }
+          });
+        };
+      } catch (e) {
+        console.error('[checkout] init error:', e);
+        alert('초기화 중 문제가 발생했습니다.');
+      }
+    }
+
+    initCheckout();
+  </script>
+</body>
+</html>

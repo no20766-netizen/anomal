@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>관리자 대시보드</title>
+  <!-- 기존 관리자 CSS 그대로 사용 -->
+  <link rel="stylesheet" href="/admin/assets/style.css"/>
+  <style>
+    /* 가벼운 보강만 */
+    .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+    .input{padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;min-width:260px}
+    .btn{padding:10px 14px;border-radius:10px;border:1px solid #111827;background:#111827;color:#fff}
+    .muted{color:#6b7280;font-size:12px}
+    .table{width:100%;border-collapse:collapse}
+    .table th,.table td{padding:10px;border-bottom:1px solid #eee;text-align:left}
+    .danger{background:#b91c1c !important;border-color:#b91c1c !important}
+    .badge{font-weight:800;font-size:20px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:900px){.grid2{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <h1>관리자 페이지</h1>
+    <button class="navbtn" onclick="nav('report')">리포트</button>
+    <button class="navbtn" onclick="nav('members')">회원 목록</button>
+    <button class="navbtn" onclick="nav('orders')">주문 목록</button>
+    <button class="navbtn" onclick="nav('cancel')">취소/환불 요청</button>
+    <button class="navbtn logout" onclick="logout()">로그아웃</button>
+  </aside>
+
+  <main class="main">
+    <!-- Report -->
+    <section id="sec-report" class="card">
+      <h2>오늘 통계</h2>
+      <div class="grid2">
+        <div class="card">
+          <h3>오늘 가입</h3>
+          <div id="todayMembersCount" class="badge">0</div>
+          <div class="muted" id="todayMembersList">—</div>
+        </div>
+        <div class="card">
+          <h3>오늘 주문</h3>
+          <div id="todayOrdersCount" class="badge">0</div>
+          <div class="muted" id="todayOrdersList">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Members -->
+    <section id="sec-members" class="card" style="display:none">
+      <h2>회원 목록</h2>
+      <div class="toolbar">
+        <input id="q" class="input" placeholder="회원 이름/이메일 검색" oninput="debouncedLoadMembers()"/>
+        <span class="muted" id="memberCount"></span>
+      </div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>이메일</th><th>이름</th><th>연락처</th><th>주소</th><th>가입일</th>
+          </tr>
+        </thead>
+        <tbody id="membersTbody"></tbody>
+      </table>
+    </section>
+
+    <!-- Orders -->
+    <section id="sec-orders" class="card" style="display:none">
+      <h2>주문 목록</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>이메일</th><th>이름</th><th>금액</th><th>상태</th><th>결제일</th>
+          </tr>
+        </thead>
+        <tbody id="ordersTbody"></tbody>
+      </table>
+    </section>
+
+    <!-- Cancel Requests -->
+    <section id="sec-cancel" class="card" style="display:none">
+      <h2>취소/환불 요청</h2>
+      <div style="margin-bottom:8px">
+        <select id="cancelFilter" class="input" style="max-width:220px" onchange="loadCancelRequests()">
+          <option value="">전체 상태</option>
+          <option>requested</option>
+          <option>approved</option>
+          <option>awaiting_return</option>
+          <option>returned</option>
+          <option>refunding</option>
+          <option>completed</option>
+          <option>rejected</option>
+          <option>failed</option>
+        </select>
+      </div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>요청ID</th><th>주문ID</th><th>요청금액</th><th>상태</th><th>사유</th><th>요청일</th><th>액션</th>
+          </tr>
+        </thead>
+        <tbody id="cancelTbody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    function nav(tab){
+      ['report','members','orders','cancel'].forEach(t=>{
+        document.getElementById('sec-'+t).style.display = (t===tab?'block':'none');
+      });
+      if(tab==='report'){ loadToday(); }
+      if(tab==='members'){ loadMembers(); }
+      if(tab==='orders'){ loadOrders(); }
+      if(tab==='cancel'){ loadCancelRequests(); }
+    }
+    async function logout(){
+      await fetch('/api/admin/logout',{method:'POST'});
+      location.href='/admin/login.html';
+    }
+
+    // Debounce
+    let timer=null;
+    function debouncedLoadMembers(){
+      clearTimeout(timer);
+      timer = setTimeout(loadMembers, 250);
+    }
+
+    // ----- Report -----
+    async function loadToday(){
+      const [mRes, oRes] = await Promise.all([
+        fetch('/api/admin/todayMembers'),
+        fetch('/api/admin/todayOrders')
+      ]);
+      const [m, o] = await Promise.all([mRes.json(), oRes.json()]);
+      document.getElementById('todayMembersCount').textContent = m.length;
+      document.getElementById('todayOrdersCount').textContent = o.length;
+      document.getElementById('todayMembersList').textContent = m.map(v=>v.email).join(', ') || '—';
+      document.getElementById('todayOrdersList').textContent = o.map(v=>v.order_id || v.id).join(', ') || '—';
+    }
+
+    // ----- Members -----
+    async function loadMembers(){
+      const q = document.getElementById('q').value || '';
+      const res = await fetch('/api/admin/members?q='+encodeURIComponent(q));
+      if(!res.ok){ console.error('members api failed'); return; }
+      const data = await res.json();
+      document.getElementById('memberCount').textContent = `총 ${data.length}명`;
+      const tb = document.getElementById('membersTbody'); tb.innerHTML='';
+      data.forEach(r=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.email||'-'}</td>
+          <td>${r.name||'-'}</td>
+          <td>${r.phone||'-'}</td>
+          <td>${r.address||'-'}</td>
+          <td>${r.created_at? new Date(r.created_at).toLocaleString() : '-'}</td>`;
+        tb.appendChild(tr);
+      });
+    }
+
+    // ----- Orders -----
+    async function loadOrders(){
+      const data = await (await fetch('/api/admin/orders')).json();
+      const tb = document.getElementById('ordersTbody'); tb.innerHTML='';
+      data.forEach(r=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.email||'-'}</td>
+          <td>${r.name||'-'}</td>
+          <td>${(r.amount||0).toLocaleString()}원</td>
+          <td>${r.status||'-'}</td>
+          <td>${r.paid_at? new Date(r.paid_at).toLocaleString() : '-'}</td>`;
+        tb.appendChild(tr);
+      });
+    }
+
+    // ----- Cancel Requests -----
+    async function loadCancelRequests(){
+      const status = document.getElementById('cancelFilter').value;
+      const url = '/api/admin/cancelRequests' + (status? ('?status='+encodeURIComponent(status)):'');
+      const data = await (await fetch(url)).json();
+      const tb = document.getElementById('cancelTbody'); tb.innerHTML='';
+      data.forEach(row=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.id}</td>
+          <td>${row.order_id}</td>
+          <td>${(row.cancel_amount ?? row.requested_amount ?? 0).toLocaleString()}원</td>
+          <td>${row.status}</td>
+          <td>${row.reason || '-'}</td>
+          <td>${row.created_at? new Date(row.created_at).toLocaleString() : '-'}</td>
+          <td>${renderCancelActions(row)}</td>`;
+        tb.appendChild(tr);
+      });
+    }
+    function renderCancelActions(row){
+      const id = row.id;
+      const btn = (label, onclick, danger=false) =>
+        `<button class="navbtn ${danger?'danger':''}" onclick="${onclick}">${label}</button>`;
+      switch(row.status){
+        case 'requested':
+          return btn('승인', `approveReq('${id}')`) + ' ' + btn('반려', `rejectReq('${id}')`, true);
+        case 'approved':
+          return btn('환불 실행', `refundReq('${id}')`);
+        case 'awaiting_return':
+          return btn('반품 입고 처리', `markReturned('${id}')`);
+        case 'returned':
+          return btn('환불 실행', `refundReq('${id}')`);
+        case 'refunding':
+          return '처리 중…';
+        case 'completed':
+          return '완료';
+        case 'rejected':
+          return '반려됨';
+        case 'failed':
+          return btn('재시도', `refundReq('${id}')`, true);
+        default:
+          return '-';
+      }
+    }
+    async function approveReq(id){
+      const amt = prompt('취소/환불 금액(원)을 입력하세요. 비워두면 자동 계산됩니다.', '');
+      const ret = confirm('회수 후 환불인가요? 확인을 누르면 "회수 대기"로 설정됩니다.');
+      const body = { id, cancelAmount: amt? Number(amt): null, returnRequired: ret };
+      const r = await fetch('/api/admin/cancelRequests/approve',{
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      if(!r.ok){ alert('승인 실패'); return; }
+      await loadCancelRequests();
+    }
+    async function rejectReq(id){
+      const reason = prompt('반려 사유를 입력하세요', '') || '';
+      const r = await fetch('/api/admin/cancelRequests/reject',{
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id, reason })
+      });
+      if(!r.ok){ alert('반려 실패'); return; }
+      await loadCancelRequests();
+    }
+    async function markReturned(id){
+      const r = await fetch('/api/admin/cancelRequests/markReturned',{
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id })
+      });
+      if(!r.ok){ alert('입고 처리 실패'); return; }
+      await loadCancelRequests();
+    }
+    async function refundReq(id){
+      if(!confirm('환불(또는 승인취소)을 실행할까요?')) return;
+      const r = await fetch('/api/admin/cancelRequests/refund',{
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id })
+      });
+      const j = await r.json().catch(()=>({}));
+      if(!r.ok){ alert('환불 실패: ' + (j.error||'')); return; }
+      await loadCancelRequests();
+    }
+
+    // 기본 탭은 "회원"
+    nav('members');
+  </script>
+</body>
+</html>
